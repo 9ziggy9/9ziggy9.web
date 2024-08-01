@@ -11,13 +11,13 @@ docker: docker_build
 	docker run -p $(PORT):$(PORT) --env-file .env dizz
 
 docker_build:
-	docker build -t dizz .
+	docker build --no-cache -t dizz .
 
 local_start_server: main.go
 	@go run $<
 
-local_start_host:
-	zrok share public localhost:$(PORT)
+zrok:
+	zrok share reserved 9ziggy9
 
 kill_server:
 	fuser -k -n tcp $(PORT)
