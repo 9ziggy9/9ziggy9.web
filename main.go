@@ -4,10 +4,13 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
+	"sync"
 )
 
 type LogLevel int
@@ -47,8 +50,8 @@ func ServerLog(lvl LogLevel, msg string, optargs ...interface{}) {
 }
 
 func LoadEnv(filename string) error {
-	ServerLog(INFO, "Loading environment variables from %s ...", filename)
-	ServerLog(INFO, "Environmental variables loaded.")
+	ServerLog(INFO, "loading environment variables from %s ...", filename)
+	ServerLog(INFO, "environmental variables loaded.")
 
 	file, err := os.Open(filename); if err != nil { return err }
 	defer file.Close()
@@ -72,6 +75,56 @@ func LoadEnv(filename string) error {
 
 const ENV_FILE string = "./.env";
 
+func ipLogWrapper(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Check the X-Forwarded-For header
+		forwardedFor := r.Header.Get("X-Forwarded-For")
+		if forwardedFor != "" {
+			// X-Forwarded-For might contain multiple IPs, take the first one
+			ip := strings.Split(forwardedFor, ",")[0]
+			ServerLog(INFO, "request from IP: %s", ip)
+		} else {
+			// Fallback to RemoteAddr
+			ip := r.RemoteAddr
+			host, _, err := net.SplitHostPort(ip)
+			if err != nil {
+				ServerLog(ERROR, "error splitting IP address: %v", err)
+				next.ServeHTTP(w, r)
+				return
+			}
+			ipAddr := net.ParseIP(host)
+			if ipAddr != nil && ipAddr.To4() != nil {
+				ip = ipAddr.String()
+			} else if ipAddr != nil && ipAddr.To16() != nil {
+				ip = ipAddr.String()
+			}
+			ServerLog(INFO, "request from IP: %s", ip)
+		}
+		next.ServeHTTP(w, r)
+	})
+}
+
+func staticHandler() http.Handler {
+	return ipLogWrapper(
+		http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+			path := strings.TrimPrefix(r.URL.Path, "/")
+			if path == "" { path = "index.html"}
+
+			absPath := filepath.Join("./public", path)
+
+			if _, err := filepath.Abs(absPath); err == nil {
+				http.ServeFile(w, r, absPath)
+			} else {
+				http.NotFound(w, r)
+			}
+		}),
+	)
+}
+
+func routes() {
+	http.Handle("/", staticHandler())
+}
+
 func init() {
 	if err := LoadEnv(ENV_FILE); err != nil {
 		ServerLog(ERROR, "failed to load environment variables:\n%v", err)
@@ -80,16 +133,26 @@ func init() {
 
 func main() {
 	server := &http.Server{
-		Addr: os.Getenv("PORT"),
+		Addr: ":" + os.Getenv("PORT"),
 		Handler: nil,
 	}
 
-	ServerLog(INFO, "Initializing server on port %s ... ", server.Addr)
+	var wait_group sync.WaitGroup
+	wait_group.Add(1)
+
+	ServerLog(INFO, "initializing server on port %s ... ", server.Addr[1:])
 
 	go func() {
-		if err := server.ListenAndServe(); err != nil {
-			ServerLog(ERROR, "failed to initialize server:\n%v", err)
+		defer wait_group.Done()
+
+		routes()
+
+		err := server.ListenAndServe();
+		if err != nil && err != http.ErrServerClosed {
+			ServerLog(ERROR, "server failure:\n%v", err)
 		}
 	}()
 
+	ServerLog(INFO, "server running on port %s ...", server.Addr[1:])
+	wait_group.Wait()
 }
