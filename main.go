@@ -75,6 +75,25 @@ func LoadEnv(filename string) error {
 
 const ENV_FILE string = "./.env";
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set(
+			"Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS",
+		)
+		w.Header().Set(
+			"Access-Control-Allow-Headers", "Content-Type, Authorization",
+		)
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func ipLogWrapper(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check the X-Forwarded-For header
@@ -106,19 +125,20 @@ func ipLogWrapper(next http.Handler) http.Handler {
 
 func staticHandler() http.Handler {
 	return ipLogWrapper(
-		http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
-			path := strings.TrimPrefix(r.URL.Path, "/")
-			if path == "" { path = "index.html"}
+		corsMiddleware(
+			http.HandlerFunc(func (w http.ResponseWriter, r *http.Request) {
+				path := strings.TrimPrefix(r.URL.Path, "/")
+				if path == "" { path = "index.html"}
 
-			absPath := filepath.Join("./public", path)
+				absPath := filepath.Join("./public", path)
 
-			if _, err := filepath.Abs(absPath); err == nil {
-				http.ServeFile(w, r, absPath)
-			} else {
-				http.NotFound(w, r)
-			}
+				if _, err := filepath.Abs(absPath); err == nil {
+					http.ServeFile(w, r, absPath)
+				} else {
+					http.NotFound(w, r)
+				}
 		}),
-	)
+	))
 }
 
 func routes() {
