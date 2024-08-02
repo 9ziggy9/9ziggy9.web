@@ -14,7 +14,7 @@ docker_build:
 	docker build --no-cache -t dizz .
 
 local_start_server: main.go
-	@go run $<
+	@go run servelog.go main.go
 
 zrok:
 	zrok share reserved 9ziggy9

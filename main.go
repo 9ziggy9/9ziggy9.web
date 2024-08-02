@@ -2,56 +2,17 @@ package main
 
 import (
 	"bufio"
-	"fmt"
-	"log"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"sync"
 )
 
-type LogLevel int
-const (
-	INFO = iota
-	SUCCESS
-	WARNING
-	ERROR
-)
-
-var LogLevelStrMap = map[LogLevel]string{
-	INFO:    "INFO",
-	SUCCESS: "SUCCESS",
-	WARNING: "WARNING",
-	ERROR:   "ERROR",
-}
-
-func extractRuntimeMetaData() (string, string, int) {
-	pc, file, line, ok := runtime.Caller(1)
-	if !ok { panic("FATAL RUNTIME EXTRACTION ERROR") }
-	fn := runtime.FuncForPC(pc).Name()
-	return fn, file, line
-}
-
-const log_fmt_info string = "[%s] -> %s\n";
-const log_fmt_err  string = "[%s] -> %s (@ %s :: %d)\n";
-func ServerLog(lvl LogLevel, msg string, optargs ...interface{}) {
-	switch (lvl) {
-	case INFO:
-		log.Printf(log_fmt_info, LogLevelStrMap[lvl], fmt.Sprintf(msg, optargs...));
-	case ERROR:
-		fn, _, line := extractRuntimeMetaData()
-		log.Fatalf(
-			log_fmt_err, LogLevelStrMap[lvl], fmt.Sprintf(msg, optargs...), fn, line,
-		)
-	}
-}
-
 func LoadEnv(filename string) error {
 	ServerLog(INFO, "loading environment variables from %s ...", filename)
-	ServerLog(INFO, "environmental variables loaded.")
+	defer ServerLog(SUCCESS, "environmental variables loaded")
 
 	file, err := os.Open(filename); if err != nil { return err }
 	defer file.Close()
@@ -173,6 +134,6 @@ func main() {
 		}
 	}()
 
-	ServerLog(INFO, "server running on port %s ...", server.Addr[1:])
+	ServerLog(SUCCESS, "server running on port %s ...", server.Addr[1:])
 	wait_group.Wait()
 }
