@@ -3,7 +3,7 @@ LIB_DIR    = $(HOME)/source/9ziggy9.web/public/lib
 
 .PHONY: all clean
 
-all:
+all: clean
 	npx webpack --config webpack.config.js
 
 clean:
