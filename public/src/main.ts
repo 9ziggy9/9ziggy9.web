@@ -12,14 +12,14 @@ function getOrCry(id: string): HTMLElement | null {
 
 interface MainViewport {
   currentView: HTMLElement | null,
-  currentViewId: string,
-  toggle: (id: string) => void,
+  currentId:   string,
+  toggle:     (id: string) => void
 }
 
 function createMainView(initId: string = "view-desktop"): MainViewport {
   return {
-    currentView:   document.getElementById(initId),
-    currentViewId: initId,
+    currentView: getOrCry(initId),
+    currentId:   initId,
     toggle: function(id: string) {
       const viewMe: HTMLElement | undefined | null = getOrCry(id);
       viewMe?.classList.toggle("hidden");
