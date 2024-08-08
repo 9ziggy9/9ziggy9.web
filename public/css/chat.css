@@ -1,7 +1,14 @@
+.fullscreen {
+    top: 0; left: 0; z-index: 1;
+    position: absolute;
+    background-color: var(--color-gray);
+    width: 100vw; height: 100vh;
+}
+
 .view-chat {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 0.5em 4fr 4em;
+    grid-template-rows: 0.75em 4fr 4em;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
 
@@ -9,17 +16,6 @@
     border-radius: 0.5rem;
     height: 90%;
     width: 90%;
-}
-
-.chat-toolbar {
-    grid-area: 1/1/2/2;
-    background-color: var(--color-green);
-    padding: 0.5rem;
-    font-size: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: black;
 }
 
 .chat-stream {

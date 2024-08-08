@@ -95,30 +95,6 @@ body {
     display: none !important;
 }
 
-.down-icon {
-    color: #CC2222;
-    font-size: 4rem;
-    animation: fadeIn 2s;
-}
-
-.check-icon {
-    font-size: 2rem;
-    animation: fadeIn 2s;
-}
-
-.center-field > p {
-    animation: fadeIn 2s;
-}
-
-@keyframes fadeIn {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-
-#loading {
-    color: #A9FFA9;
-}
-
 @font-face {
     font-family: 'Material Icons';
     font-display: block;
