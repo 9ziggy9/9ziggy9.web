@@ -27,9 +27,14 @@
   align-items: center;
 }
 
-.topnav-left {
+.topnav span {
     display: flex;
+    align-items: center;
+    font-size: 2rem;
 }
+
+.topnav-left { display: flex; }
+
 .topnav-right {}
 
 /* Style the links inside the navigation bar */

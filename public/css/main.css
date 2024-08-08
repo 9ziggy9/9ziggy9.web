@@ -65,6 +65,14 @@ body {
     background-color: black;
 }
 
+.view-desktop {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: grey;
+    font-color: black;
+}
+
 .footer {
     display: flex;
     justify-content: center;

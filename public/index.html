@@ -12,22 +12,22 @@
     <link 
       rel="preload"
       as="style" onload="this.rel = 'stylesheet'"
-      href="https://fonts.googleapis.com/icon?family=
-            Material+Symbols+Outlined&display=block">
+      href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined&display=block">
     <!-- <link -->
     <!--   type="image/png" -->
     <!--   sizes="16x16" rel="icon" href="./zigfav.png"> -->
-    <title>9ziggy</title>
+    <title>9ziggy9</title>
   </head>
   <body>
     <!-- TOP NAVIGATION -->
     <div class="app-container" id="app-container">
       <div class="topnav grid-top-bar" id="topnav">
         <div class="topnav-left">
-          <div class="navanchor"><p>home</p></div>
-          <div class="navanchor"><p>news</p></div>
-          <div class="navanchor"><p>contact</p></div>
-          <div class="navanchor"><p>about</p></div>
+          <div class="navanchor">
+            <span id="view-chat-btn" class="material-symbols-outlined">
+              chat
+            </span>
+          </div>
         </div>
         <div class="topnav-right">
           <div class="clock" id="clock"><p>12:00 PM</p></div>
@@ -36,9 +36,16 @@
 
       <!-- MAIN AREA -->
       <div class="main grid-main" id="main">
-        <h1>9ziggy9</h1>
+        <!-- DESKTOP VIEW -->
+        <div class="view-desktop" id="view-desktop">
+          <h1>9ziggy9</h1>
+        </div>
+        <!-- CHAT VIEW -->
+        <div class="hidden view-chat" id="view-chat">
+          <h1>chat</h1>
+        </div>
       </div>
-
+      
       <!-- FOOTER -->
       <div class="footer grid-footer" id="footer"><p>footer</p></div>
     </div>
