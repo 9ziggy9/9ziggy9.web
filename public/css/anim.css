@@ -1,4 +1,4 @@
-@keyframes popup-scale-blur {
+@keyframes win-pop-in {
     0% {
         opacity: 0;
         transform-origin: 50% 50%;
@@ -12,11 +12,28 @@
         filter: blur(0px);
     }
 }
- 
-.popup-scale-blur {
-  animation: popup-scale-blur 1s both;
+
+@keyframes win-pop-out {
+    0% {
+        opacity: 1;
+        transform-origin: 50% 50%;
+        transform: scale(1, 1);
+        filter: blur(0px);
+       }
+    100% {
+        opacity: 0;
+        transform-origin: 50% 50%;
+        transform: scale(.25, .25);
+        filter: blur(90px);
+        display: none !important;
+    }
 }
 
-.popup-scale-blur-view {
-  animation: popup-scale-blur 0.33s both;
+@keyframes init-load {
+    0% { opacity: 0; filter: blur(150px); }
+    100% { opacity: 1; filter: blur(0px); }
 }
+ 
+.init-load-anim { animation: init-load 0.66s both; }
+.win-pop-view-in { animation: win-pop-in 0.33s both; }
+.win-pop-view-out { animation: win-pop-out 0.33s both; }

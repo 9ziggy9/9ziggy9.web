@@ -39,14 +39,28 @@ function _wrap(id: string, mv: MasterView): void {
     ?.addEventListener("click", () => mv.toggleFullscreen(id));
 }
 
-function _toggleClass(
+type anim = { in: string, out: string, dt: number };
+
+function _classSwitch(
   className: string,
   elIden:    string,
   view:      HTMLElement | null,
+  anim?:     anim,
 ): void {
   const viewMe: HTMLElement | undefined | null = common.getIdOrCry(elIden);
-  viewMe?.classList.toggle(className);
-  view?.classList.toggle(className);
+  const vmClasses = viewMe?.classList;
+  if (!vmClasses?.contains(className) && anim) {
+    vmClasses?.add(anim.out);
+    setTimeout(() => {
+      vmClasses?.remove(anim.out);
+      vmClasses?.add(className, anim.in);
+      view?.classList.toggle(className);
+    }, anim.dt);
+  } else {
+    if (anim) vmClasses?.add(anim.in);
+    vmClasses?.toggle(className);
+    view?.classList.toggle(className);
+  }
 }
 
 function _createMasterView(initId: string): MasterView {
@@ -55,11 +69,15 @@ function _createMasterView(initId: string): MasterView {
     mainView: common.getIdOrCry(initId),
 
     toggleMain: function(id: string) {
-      _toggleClass("hidden", id, this.mainView);
+      _classSwitch("hidden", id, this.mainView, {
+        in: "win-pop-view-in",
+        out: "win-pop-view-out",
+        dt: 150
+      });
     },
 
     toggleFullscreen: function(id: string) {
-      _toggleClass("fullscreen", id, this.fullscreenView);
+      _classSwitch("fullscreen", id, this.fullscreenView);
     },
 
     winWrap: (id: string) => {
