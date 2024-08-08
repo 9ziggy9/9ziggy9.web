@@ -20,7 +20,7 @@
   </head>
   <body>
     <!-- TOP NAVIGATION -->
-    <div class="app-container" id="app-container">
+    <div class="app-container popup-scale-blur" id="app-container">
       <div class="topnav grid-top-bar" id="topnav">
         <div class="topnav-left">
           <div class="navanchor">
@@ -41,10 +41,12 @@
           <h1>9ziggy9</h1>
         </div>
         <!-- CHAT VIEW -->
-        <div class="hidden view-chat" id="view-chat">
-          <div class="chat-stream" id="chat-stream">
-            test
-          </div>
+        <div class="hidden view-chat popup-scale-blur-view" id="view-chat">
+          <div class="chat-toolbar" id="chat-toolbar">
+            <div class="topnav-left"><p>chat</p></div>
+            <div class="topnav-right"><p>X</p></div>
+           </div>
+          <div class="chat-stream" id="chat-stream">connected</div>
           <div class="chat-send" id="chat-send">
             <textarea id="chat-input"
                       class="textbox"

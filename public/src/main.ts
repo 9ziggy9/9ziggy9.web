@@ -1,5 +1,7 @@
 import '../css/main.css'
+import '../css/anim.css'
 import '../css/topnav.css'
+import '../css/chat.css'
 
 function getOrCry(id: string): HTMLElement | null {
   const el: HTMLElement | null = document.getElementById(id);
