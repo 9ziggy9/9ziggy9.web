@@ -17,7 +17,16 @@ function main(): void {
 
   mv.winWrap("view-chat", [
     {
-      "title": "chat",
+      "title": "hello",
+      "fields": {
+        "chat": () => console.log("hello from chat button"),
+        "lol":          null,
+        "hello world":  null,
+        "goodbye moon": null,
+      }
+    },
+    {
+      "title": "world",
       "fields": {
         "chat": () => console.log("hello from chat button"),
         "lol":          null,

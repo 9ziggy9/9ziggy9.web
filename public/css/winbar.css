@@ -43,7 +43,7 @@
     align-items: center;
 }
 
-.winbar-right span {
+.winbar-right span, .winbar-left span {
     font-size: 1rem;
     padding: 0.25rem;
 }
