@@ -19,9 +19,7 @@ const WIN_TOOL_BAR_HTML = `
   </div>
 `
 
-function _dropUtilityMenu(
-  bar: HTMLElement, btn: HTMLElement, menu: HTMLElement
-): void {
+function _dropUtilityMenu(btn: HTMLElement, menu: HTMLElement): void {
   /*
     KNOWN BUG:
     If resize happens after a button is pressed, this will lead to drift of
@@ -31,9 +29,8 @@ function _dropUtilityMenu(
     TODO: Clicking outside closes dropdown. This should also fix bug.
    */
   menu.classList.toggle("hidden");
-  const rectbar = bar.getBoundingClientRect();
   const rectbtn = btn.getBoundingClientRect();
-  menu.style.top  = `${rectbar.bottom}px`;
+  menu.style.top  = `${rectbtn.bottom}px`;
   menu.style.left = `${rectbtn.left}px`;
 }
 
@@ -57,9 +54,18 @@ function _injectToolbar(
         const menu = document.createElement("div");
         menu.classList.add("utility-menu", "hidden");
         document.body.appendChild(menu);
-        menuBtn.addEventListener(
-          "click", () => _dropUtilityMenu(winbar as HTMLElement, menuBtn, menu)
-        );
+        menuBtn.addEventListener("click", () => {
+          _dropUtilityMenu(menuBtn, menu);
+          menuBtn.classList.toggle("utility-menu-btn-on");
+        });
+        document.addEventListener("click", (e) =>{
+          if (!menuBtn.contains(e.target as Node)
+            && !menu.contains(e.target as Node))
+          {
+            menu.classList.add("hidden");
+            menuBtn.classList.remove("utility-menu-btn-on");
+          }
+        });
         for (const [lbl, fn] of Object.entries(um.fields)) {
           const div = document.createElement("div");
           div.classList.add("utility-menu-field-btn");

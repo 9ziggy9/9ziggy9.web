@@ -1,7 +1,35 @@
 .utility-menu {
     position: absolute;
-    background-color: red;
+    border: 0.065rem solid var(--color-gray);
+    border-radius: 0.24rem;
+    font-size: 1rem;
     z-index: 1;
-    width: 100px;
-    height: 100px;
+    background-color: black;
+    color: var(--color-green);
+    padding: 0.5rem;
+}
+
+.utility-menu-btn:hover {
+    background-color: black;
+    color: var(--color-green);
+}
+
+.utility-menu-field-btn:first-of-type {
+    border-top: 0.012rem dashed var(--color-gray);
+}
+
+.utility-menu-field-btn {
+    border-bottom: 0.024rem dashed var(--color-gray);
+}
+
+.utility-menu-field-btn:hover {
+    background-color: var(--color-blue);
+    color: black;
+}
+
+.utility-menu-btn-on {
+    border-radius: 0.24rem;
+    border: 0.065rem solid var(--color-gray);
+    background-color: black;
+    color: var(--color-green);
 }
