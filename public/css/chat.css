@@ -8,12 +8,12 @@
     grid-template-rows: 1fr 4em;
     grid-column-gap: 0px;
     grid-row-gap: 0px;
-    background-color: black;
+    background-color: var(--color-black);
 }
 
 .chat-stream {
     grid-area: 1/1/2/2;
-    background-color: black;
+    background-color: var(--color-black);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -21,7 +21,7 @@
 
 .chat-send {
     grid-area: 2/1/3/2;
-    background-color: black;
+    background-color: var(--color-black);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -31,7 +31,7 @@
     width: 90%;
     min-height: 100%;
     border-color: var(--color-green);
-    background-color: black;
+    background-color: var(--color-black);
     border-right: none;
     padding: 0.5rem 0.5rem;
     box-sizing: border-box;
@@ -51,7 +51,7 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: black; /* Background color of the scrollbar track */
+    background: var(--color-black); /* Background color of the scrollbar track */
     min-width: 0.125rem;
 }
 
@@ -119,7 +119,7 @@
 #chat-btn-send {
     height: 50%;
     border: 0.1rem solid var(--color-green);
-    background-color: black;
+    background-color: var(--color-black);
     color: var(--color-green);
 }
 
@@ -127,16 +127,16 @@
     height: 50%;
     border: 0.1rem solid var(--color-green);
     border-top: none;
-    background-color: black;
+    background-color: var(--color-black);
     color: var(--color-red);
 }
 
 #chat-btn-cancel:hover {
     background-color: var(--color-red);
-    color: black;
+    color: var(--color-black);
 }
 
 #chat-btn-send:hover {
     background-color: var(--color-green);
-    color: black;
+    color: var(--color-black);
 }

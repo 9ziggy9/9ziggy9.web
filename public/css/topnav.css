@@ -48,6 +48,10 @@
   font-size: 1.5rem;
 }
 
+.clock p {
+    color: var(--color-green);
+}
+
 /* Change the color of links on hover */
 .navanchor:hover {
   background-color: var(--color-darker-gray);

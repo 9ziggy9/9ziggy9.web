@@ -22,7 +22,7 @@
     font-size: 1rem;
     display: flex;
     justify-content: space-between;
-    color: black;
+    color: var(--color-black);
     height: 100%;
 }
 
