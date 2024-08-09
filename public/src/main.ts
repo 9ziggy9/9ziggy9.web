@@ -15,28 +15,30 @@ function viewMountHandler(id: string, ev: string, fn: EventListener): void {
 function main(): void {
   const mv: MasterView = win.createMasterView();
 
-  mv.winWrap("view-chat", [
-    {
-      "title": "hello",
-      "fields": {
-        "chat": () => console.log("hello from chat button"),
-        "lol":          null,
-        "hello world":  null,
-        "goodbye moon": null,
-      }
+  mv.windowFrom({
+    id: "view-chat",
+    name: "chat",
+    scales: {
+      default: { width: "90%",    height: "90%" },
+      max:     { width: "1280px", height: "1040px" }
     },
-    {
-      "title": "world",
-      "fields": {
-        "chat": () => console.log("hello from chat button"),
-        "lol":          null,
-        "hello world":  null,
-        "goodbye moon": null,
-      }
-    }
-  ]);
+    utilities: [
+      {
+        title: "actions",
+        fields: {
+          connect: () => console.log("hello from chat button"),
+          name:    null,
+          exit: () => {
+            mv.toggleMain("view-chat");
+            Array.from(document.getElementsByClassName("utility-menu"))
+              .forEach((el) => el.classList.add("hidden"));
+          }
+        }
+      },
+    ]
+  });
 
-  viewMountHandler("view-chat-btn",  "click", () => mv.toggleMain("view-chat"));
+  viewMountHandler("view-chat-btn",  "click", () => mv.toggleMain("chat"));
 }
 
 window.onload = main

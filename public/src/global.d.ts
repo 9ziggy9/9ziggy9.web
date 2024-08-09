@@ -9,10 +9,34 @@ interface UtilityMenu {
   fields: UtilityFields;
 }
 
+interface ViewScaleDims { width?: string; height?: string; }
+
+interface ViewScalingTable {
+  default?: ViewScaleDims;
+  min?:     ViewScaleDims;
+  max?:     ViewScaleDims;
+}
+
+interface ViewSpec {
+  id: string;
+  name: string;
+  scales?: ViewScalingTable;
+  utilities?: UtilityMenu[];
+}
+
+interface WindowView {
+  id:   string;
+  root: HTMLElement;
+  spec: ViewSpec;
+}
+
 interface MasterView {
-  fullscreenView: HTMLElement | null,
-  mainView:       HTMLElement | null,
-  toggleMain:       (id: string) => void,
-  toggleFullscreen: (id: string) => void,
-  winWrap:          (id: string, uts?: UtilitySpec) => void,
+  fullscreenView:   HTMLElement | null,
+  mainView:         HTMLElement | null,
+  _windowTable:      { [string]: WindowView },
+
+  toggleMain:       (id: string)     => void,
+  toggleFullscreen: (id: string)     => void,
+  windowFrom:       (spec: ViewSpec) => WindowView | null,
+  getWindow:        (id: string)     => WindowView,
 }

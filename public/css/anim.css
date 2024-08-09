@@ -37,5 +37,11 @@
 .init-load-anim      { animation: init-load 0.66s both; }
 .win-pop-view-in     { animation: win-pop-in 0.33s both; }
 .win-pop-view-out    { animation: win-pop-out 0.33s both; }
-.fullscreen-view-in  { transition: width 0.33s ease, height 0.33s ease; }
-.fullscreen-view-out { transition: width 0.33s ease, height 0.33s ease; }
+
+.fullscreen-view-in  {
+    transition: width 0.33s ease, height 0.33s ease;
+}
+
+.fullscreen-view-out  {
+    transition: width 0.33s ease, height 0.33s ease;
+}

@@ -2,11 +2,11 @@
     position: absolute;
     border: 0.065rem solid var(--color-gray);
     border-radius: 0.24rem;
-    font-size: 1rem;
+    font-size: 1.5rem;
     z-index: 1;
     background-color: black;
     color: var(--color-green);
-    padding: 0.5rem;
+    padding: 0.88rem;
 }
 
 .utility-menu-btn:hover {
