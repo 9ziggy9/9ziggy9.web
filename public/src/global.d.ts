@@ -20,6 +20,7 @@ interface ViewScalingTable {
 interface ViewSpec {
   id: string;
   name: string;
+  template?: string;
   scales?: ViewScalingTable;
   utilities?: UtilityMenu[];
 }

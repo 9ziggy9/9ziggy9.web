@@ -34,18 +34,22 @@ function _dropUtilityMenu(btn: HTMLElement, menu: HTMLElement): void {
   menu.style.left = `${rectbtn.left}px`;
 }
 
-function _injectToolbar(
-  id: string, uMap?: UtilityMenu[],
-): HTMLElement | undefined | null {
-  const rootEl          = common.getIdOrCry(id);
+function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
+  const {id, utilities, template} = spec;
+  const root = common.getIdOrCry(id);
+  if (!root) return;
+  if (template) {
+    const tmpl = document.getElementById(template) as HTMLTemplateElement;
+    if (tmpl) root.appendChild(tmpl.content);
+  }
   const winbarContainer = document.createElement("div");
   winbarContainer.innerHTML = WIN_TOOL_BAR_HTML;
   const winbar = winbarContainer.querySelector(".winbar");
-  if (winbar) rootEl?.insertBefore(winbar, rootEl.firstChild);
-  if (uMap && winbar) {
+  if (winbar) root.insertBefore(winbar, root.firstChild);
+  if (utilities && winbar) {
     const uts = winbar.querySelector(".winbar-left");
     if (uts) {
-      uMap.forEach(um => {
+      utilities.forEach(um => {
         const menuBtn    = document.createElement("div");
         const menuBtnLbl = document.createElement("span");
         menuBtnLbl.innerText = um.title;
@@ -80,7 +84,7 @@ function _injectToolbar(
     }
   }
   else console.error("No element with 'winbar' found in HTML.");
-  return rootEl;
+  return root;
 }
 
 function _setSizing(vw: WindowView, override?: ViewScalingTable) {
@@ -97,7 +101,7 @@ function _setSizing(vw: WindowView, override?: ViewScalingTable) {
 }
 
 function _wrapWin(spec: ViewSpec, mv: MasterView): WindowView | null {
-  const root = _injectToolbar(spec.id, spec.utilities);
+  const root = _injectToolbar(spec);
   if (!root) {
     console.error("failed to inject into root view div!");
     return null;

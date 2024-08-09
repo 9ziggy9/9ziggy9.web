@@ -34,46 +34,53 @@
           <div class="clock" id="clock"><p>12:00 PM</p></div>
         </div>
       </div> 
+
       <!-- MAIN AREA -->
       <div class="main grid-main" id="main">
+
         <!-- DESKTOP VIEW -->
         <div class="view-desktop" id="view-desktop">
           <h1>9ziggy9</h1>
         </div>
+
         <!-- CHAT VIEW -->
-        <div id="view-chat">
-          <div class="chat-outer">
-            <div class="chat-stream" id="chat-stream">
-              <div class="chat-stream-display">
-                <div class="chat-stream-messages">
-                  hello world
-                </div>
-                <div class="chat-stream-online">
-                  hello world
-                </div>
-              </div>
-            </div>
-            <div class="chat-send" id="chat-send">
-              <div class="comm-container">
-                <textarea id="chat-input"
-                          class="textbox"
-                          placeholder="type here"></textarea>
-                <div class="btn-stack">
-                  <button id="chat-btn-send" type="button">
-                    <span class="material-symbols-outlined">send</span>
-                  </button>
-                  <button id="chat-btn-cancel" type="button">
-                    <span class="material-symbols-outlined">backspace</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <div id="view-chat"></div>
+
       </div>
       
       <!-- FOOTER -->
       <div class="footer grid-footer" id="footer"><p>9ziggy9</p></div>
     </div>
   </body>
+
+  <template id="--templ-view-chat">
+    <div class="chat-outer">
+      <div class="chat-stream" id="chat-stream">
+        <div class="chat-stream-display">
+          <div class="chat-stream-messages">
+            hello world
+          </div>
+          <div class="chat-stream-online">
+            hello world
+          </div>
+        </div>
+      </div>
+      <div class="chat-send" id="chat-send">
+        <div class="comm-container">
+          <textarea id="chat-input"
+                    class="textbox"
+                    placeholder="type here"></textarea>
+          <div class="btn-stack">
+            <button id="chat-btn-send" type="button">
+              <span class="material-symbols-outlined">send</span>
+            </button>
+            <button id="chat-btn-cancel" type="button">
+              <span class="material-symbols-outlined">backspace</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
 </html>

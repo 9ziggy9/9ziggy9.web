@@ -17,6 +17,7 @@ function main(): void {
 
   mv.windowFrom({
     id: "view-chat",
+    template: "--templ-view-chat",
     name: "chat",
     scales: {
       default: { width: "90%",    height: "90%" },
