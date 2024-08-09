@@ -11,7 +11,7 @@ docker: docker_build
 	docker run -p $(PORT):$(PORT) --env-file .env 9ziggy9.web
 
 docker_build:
-	docker build --no-cache -t dizz .
+	docker build --no-cache -t 9ziggy9.web .
 
 local_start_server: main.go
 	@go run servelog.go main.go

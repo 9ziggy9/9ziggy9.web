@@ -33,10 +33,6 @@
     font-size: 2rem;
 }
 
-.topnav-left { display: flex; }
-
-.topnav-right {}
-
 /* Style the links inside the navigation bar */
 .navanchor {
   color: var(--color-white);

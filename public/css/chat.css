@@ -1,13 +1,3 @@
-.view-chat {
-    border: medium solid var(--color-green);
-    border-radius: 0.5rem;
-    height: 90%;
-    width: 90%;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 0.75em 1fr;
-}
-
 .chat-outer {
     grid-area: 2/1/3/2;
     box-sizing: border-box;

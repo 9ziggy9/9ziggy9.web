@@ -1,8 +1,8 @@
 import * as common from "./common"
 
 const WIN_TOOL_BAR_HTML = `
-  <div class="winbar" id="chatbar">
-    <div class="winbar-left"><p>chat</p></div>
+  <div class="winbar">
+    <div class="winbar-left"></div>
     <div class="winbar-right">
       <div class="winbar-min-max">
         <span class="material-symbols-outlined">
@@ -19,18 +19,67 @@ const WIN_TOOL_BAR_HTML = `
   </div>
 `
 
-function _injectToolbar(id: string): HTMLElement | undefined | null {
+function _dropUtilityMenu(
+  bar: HTMLElement, btn: HTMLElement, menu: HTMLElement
+): void {
+  /*
+    KNOWN BUG:
+    If resize happens after a button is pressed, this will lead to drift of
+    the menu. This is easy to understand, as there is no recomputation of
+    rectbtn.bottom and rectbtn.left.
+
+    TODO: Clicking outside closes dropdown. This should also fix bug.
+   */
+  menu.classList.toggle("hidden");
+  const rectbar = bar.getBoundingClientRect();
+  const rectbtn = btn.getBoundingClientRect();
+  menu.style.top  = `${rectbar.bottom}px`;
+  menu.style.left = `${rectbtn.left}px`;
+}
+
+function _injectToolbar(
+  id: string, uMap?: UtilityMenu[],
+): HTMLElement | undefined | null {
   const rootEl          = common.getIdOrCry(id);
   const winbarContainer = document.createElement("div");
   winbarContainer.innerHTML = WIN_TOOL_BAR_HTML;
   const winbar = winbarContainer.querySelector(".winbar");
   if (winbar) rootEl?.insertBefore(winbar, rootEl.firstChild);
+  if (uMap && winbar) {
+    const uts = winbar.querySelector(".winbar-left");
+    if (uts) {
+      uMap.forEach(um => {
+        const menuBtn    = document.createElement("div");
+        const menuBtnLbl = document.createElement("span");
+        menuBtnLbl.innerText = um.title;
+        menuBtn.appendChild(menuBtnLbl);
+        menuBtn.classList.add("utility-menu-btn")
+        const menu = document.createElement("div");
+        menu.classList.add("utility-menu", "hidden");
+        document.body.appendChild(menu);
+        menuBtn.addEventListener(
+          "click", () => _dropUtilityMenu(winbar as HTMLElement, menuBtn, menu)
+        );
+        for (const [lbl, fn] of Object.entries(um.fields)) {
+          const div = document.createElement("div");
+          div.classList.add("utility-menu-field-btn");
+          const spanLabel = document.createElement("span");
+          spanLabel.innerText = lbl;
+          div.appendChild(spanLabel);
+          div.addEventListener("click", fn ? fn : () => {});
+          menu.appendChild(div);
+        }
+        uts.appendChild(menuBtn);
+      })
+    }
+  }
   else console.error("No element with 'winbar' found in HTML.");
   return rootEl;
 }
 
-function _wrap(id: string, mv: MasterView): void {
-  const root = _injectToolbar(id);
+function _wrap(id: string, mv: MasterView, uts?: UtilityMenu[]): void {
+  const root = _injectToolbar(id, uts);
+  root?.classList.add("hidden", "view-win");
   root
     ?.querySelector(".winbar-close")
     ?.addEventListener("click", () => mv.toggleMain(id));
@@ -39,13 +88,11 @@ function _wrap(id: string, mv: MasterView): void {
     ?.addEventListener("click", () => mv.toggleFullscreen(id));
 }
 
-type anim = { in: string, out: string, dt: number };
-
 function _classSwitch(
   className: string,
   elIden:    string,
   view:      HTMLElement | null,
-  anim?:     anim,
+  anim?:     cssAnim,
 ): void {
   const viewMe: HTMLElement | undefined | null = common.getIdOrCry(elIden);
   const vmClasses = viewMe?.classList;
@@ -78,8 +125,8 @@ function _createMasterView(initId: string): MasterView {
 
     toggleFullscreen: function(id: string) {
       _classSwitch("fullscreen", id, this.fullscreenView, {
-        in: "fullscreen-view",
-        out: "fullscreen-view",
+        in: "fullscreen-view-in",
+        out: "fullscreen-view-out",
         dt: 150
       });
     },
@@ -92,6 +139,6 @@ function _createMasterView(initId: string): MasterView {
 
 export function createMasterView(initId: string = "view-desktop"): MasterView {
   const mv = _createMasterView(initId);
-  mv.winWrap = (id: string) => _wrap(id, mv);
+  mv.winWrap = (id: string, uts?: UtilityMenu[]) => _wrap(id, mv, uts);
   return mv;
 }
