@@ -77,11 +77,15 @@ function _createMasterView(initId: string): MasterView {
     },
 
     toggleFullscreen: function(id: string) {
-      _classSwitch("fullscreen", id, this.fullscreenView);
+      _classSwitch("fullscreen", id, this.fullscreenView, {
+        in: "fullscreen-view",
+        out: "fullscreen-view",
+        dt: 150
+      });
     },
 
     winWrap: (id: string) => {
-      console.error("UNIMPLEMENTED: did you call createMasterView?")
+      console.error("UNIMPLEMENTED: did you call createMasterView?");
     },
   }
 }
