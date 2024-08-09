@@ -91,7 +91,7 @@ func staticHandler() http.Handler {
 				path := strings.TrimPrefix(r.URL.Path, "/")
 				if path == "" { path = "index.html"}
 
-				absPath := filepath.Join("./public", path)
+				absPath := filepath.Join("./public/dist", path)
 
 				if _, err := filepath.Abs(absPath); err == nil {
 					http.ServeFile(w, r, absPath)

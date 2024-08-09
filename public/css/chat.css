@@ -141,7 +141,12 @@
     color: var(--color-red);
 }
 
-.btn-stack > button:hover {
-    background-color: var(--color-teal);
+#chat-btn-cancel:hover {
+    background-color: var(--color-red);
+    color: black;
 }
 
+#chat-btn-send:hover {
+    background-color: var(--color-green);
+    color: black;
+}

@@ -8,7 +8,7 @@ PORT := $(PORT)
 .PHONY: start_server start_host kill_server zrok_shell docker_build
 
 docker: docker_build
-	docker run -p $(PORT):$(PORT) --env-file .env dizz
+	docker run -p $(PORT):$(PORT) --env-file .env 9ziggy9.web
 
 docker_build:
 	docker build --no-cache -t dizz .
