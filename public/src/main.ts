@@ -7,12 +7,14 @@ import "../css/utility-menu.css"
 
 import * as common from "./common"
 import * as win from "./window"
+import * as themes from "./themes"
 
 function viewMountHandler(id: string, ev: string, fn: EventListener): void {
   common.getIdOrCry(id)?.addEventListener(ev, fn);
 }
 
 function main(): void {
+  themes.selectTheme(themes.TOKYO);
   const mv: MasterView = win.createMasterView();
 
   mv.windowFrom({
@@ -30,7 +32,7 @@ function main(): void {
           connect: () => console.log("hello from chat button"),
           name:    null,
           exit: () => {
-            mv.toggleMain("view-chat");
+            mv.toggleMain("chat");
             Array.from(document.getElementsByClassName("utility-menu"))
               .forEach((el) => el.classList.add("hidden"));
           }
