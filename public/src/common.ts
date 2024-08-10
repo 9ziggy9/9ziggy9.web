@@ -34,13 +34,14 @@ export function hideOnUnboundedClick(btn: HTMLElement, menu: HTMLElement) {
 export function revealMenu(
   btn: HTMLElement, menu: HTMLElement, dir: RevealDir
 ): void {
-  console.log("clicked a reveal menu: ", dir);
   menu.classList.toggle("hidden");
   const rectbtn = btn.getBoundingClientRect();
   menu.style[dir === RevealDir.DOWN
     ? RevealDir.UP
-    : RevealDir.DOWN
-  ]  = `${rectbtn[dir]}px`;
+    : RevealDir.DOWN ]
+    = `${dir == RevealDir.UP
+      ? window.innerHeight - rectbtn[dir]
+      : rectbtn[dir]}px`;
   menu.style.left = `${rectbtn.left}px`;
 }
 
