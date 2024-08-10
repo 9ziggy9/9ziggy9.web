@@ -6,23 +6,31 @@ import "../css/winbar.css"
 import "../css/utility-menu.css"
 
 import * as common from "./common"
-import * as win from "./window"
 import * as themes from "./themes"
+import * as    win from "./window"
 
 function viewMountHandler(id: string, ev: string, fn: EventListener): void {
   common.getIdOrCry(id)?.addEventListener(ev, fn);
 }
 
 function loadThemes(): void {
-  themes.bootstrap();
+  const themeControl = themes.bootstrap();
+  themeControl.select("NINEZIG");
   const btn = common.getIdOrDie("color-theme-btn");
   if (btn) {
     const menu = document.createElement("div");
     menu.classList.add("utility-menu", "hidden");
     document.body.append(menu);
-    menu.innerHTML = `<p>hello</p><p>moar</p>`
+    for (const theme of Object.keys(themeControl.lib)) {
+      const curr = common.constructMenuField(menu, theme, () => {
+        themeControl.select(theme);
+        themeControl.cycleCurrent(curr);
+      });
+      if (theme == "NINEZIG") themeControl.cycleCurrent(curr);
+    }
     btn.addEventListener("click", () => {
       common.revealMenu(btn, menu, common.RevealDir.UP);
+      btn.classList.toggle("utility-menu-btn-on");
     });
     common.hideOnUnboundedClick(btn, menu);
   }
@@ -44,7 +52,7 @@ function main(): void {
       {
         title: "actions",
         fields: {
-          connect: () => console.log("hello from chat button"),
+          connect: () => console.log("connecting ..."),
           name:    null,
           exit: () => {
             mv.toggleMain("chat");

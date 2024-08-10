@@ -14,17 +14,13 @@ export function getIdOrCry(id: string): HTMLElement | null {
 
 export function getIdOrDie(id: string): HTMLElement | null {
   const el: HTMLElement | null = document.getElementById(id);
-  if (!el) {
-    throw Error(`Couldn't find element with id ${id}`);
-  }
+  if (!el) throw Error(`Couldn't find element with id ${id}`);
   return el;
 }
 
 export function hideOnUnboundedClick(btn: HTMLElement, menu: HTMLElement) {
   document.addEventListener("click", (e) =>{
-    if (!btn.contains(e.target as Node)
-      && !menu.contains(e.target as Node))
-    {
+    if (!btn.contains(e.target as Node) && !menu.contains(e.target as Node)) {
       menu.classList.add("hidden");
       btn.classList.remove("utility-menu-btn-on");
     }
@@ -39,9 +35,24 @@ export function revealMenu(
   menu.style[dir === RevealDir.DOWN
     ? RevealDir.UP
     : RevealDir.DOWN ]
-    = `${dir == RevealDir.UP
-      ? window.innerHeight - rectbtn[dir]
-      : rectbtn[dir]}px`;
+    = `${
+      dir == RevealDir.UP
+          ? window.innerHeight - rectbtn[dir]
+          : rectbtn[dir]
+      }px`;
   menu.style.left = `${rectbtn.left}px`;
 }
 
+export function constructMenuField(
+  menu: HTMLElement, lbl: string,
+  fn: ((this: HTMLDivElement, ev: MouseEvent) => any) | null,
+): HTMLElement {
+  const div = document.createElement("div");
+  div.classList.add("utility-menu-field-btn");
+  const spanLabel = document.createElement("span");
+  spanLabel.innerText = lbl;
+  div.appendChild(spanLabel);
+  div.addEventListener("click", fn ? fn : () => {});
+  menu.appendChild(div);
+  return div;
+}

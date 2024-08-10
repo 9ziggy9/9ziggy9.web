@@ -33,3 +33,13 @@
     background-color: var(--color-black);
     color: var(--color-green);
 }
+
+.color-theme-btn, .color-theme-btn:hover{
+    radius: 0.25rem;
+    z-index: 2;
+}
+
+.theme-selection-on {
+    background-color: var(--color-blue);
+    color: var(--color-black);
+}

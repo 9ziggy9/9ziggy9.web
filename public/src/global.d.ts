@@ -4,6 +4,14 @@ type UtilityFields = {
   [k: string]: ((this: HTMLDivElement, ev: MouseEvent) => any) | null;
 }
 
+type ThemeState   = { css: string, active: boolean };
+type ThemeLibrary = { [k: string]: ThemeState };
+interface ThemeController {
+  lib: ThemeLibrary;
+  select:       (string) => void;
+  cycleCurrent: (HTMLElement) => void;
+}
+
 interface UtilityMenu {
   title: string;
   fields: UtilityFields;

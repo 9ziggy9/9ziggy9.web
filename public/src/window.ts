@@ -50,13 +50,7 @@ function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
         });
         common.hideOnUnboundedClick(btn, menu);
         for (const [lbl, fn] of Object.entries(um.fields)) {
-          const div = document.createElement("div");
-          div.classList.add("utility-menu-field-btn");
-          const spanLabel = document.createElement("span");
-          spanLabel.innerText = lbl;
-          div.appendChild(spanLabel);
-          div.addEventListener("click", fn ? fn : () => {});
-          menu.appendChild(div);
+          common.constructMenuField(menu, lbl, fn);
         }
         uts.appendChild(btn);
       })
