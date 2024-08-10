@@ -4,12 +4,23 @@
   needed.
 */
 
-export function selectTheme(theme: string): void {
-  const css = document.getElementsByTagName("style")[0];
+export function bootstrap(): void {
+  const styleEntry = document.createElement("style");
+  styleEntry.id = "color-theme";
+  document.head.appendChild(styleEntry);
+  selectTheme(library.TOKYO);
+}
+
+function selectTheme(theme: string): void {
+  const css = document.getElementById("color-theme") as HTMLElement;
   css.innerHTML = theme;
 }
 
-export const DEFAULT = `
+export const library: {[k: string]: string}= {}
+
+function DEFINE_THEME(k: string, css: string): void { library[k] = css; }
+
+DEFINE_THEME("9ZIG9", `
       :root {
           --color-dark:         #232A2D;
           --color-light-red:    #E57474;
@@ -30,9 +41,9 @@ export const DEFAULT = `
           --color-gray:         #BDC3C2;
           --color-white:        #eceff4;
       }
-`
+`)
 
-export const SOLARIZED = `
+DEFINE_THEME("SOLARIZED", `
       :root {
           --color-dark:         #073642;
           --color-light-red:    #dc322f;
@@ -53,9 +64,9 @@ export const SOLARIZED = `
           --color-gray:         #657b83;
           --color-white:        #fdf6e3;
       }
-`
+`)
 
-export const NORD = `
+DEFINE_THEME("NORD", `
       :root {
           --color-dark:         #4c566a;
           --color-light-red:    #bf616a;
@@ -76,9 +87,9 @@ export const NORD = `
           --color-gray:         #e5e9f0;
           --color-white:        #ffffff;
       }
-`
+`)
 
-export const GRUVBOX = `
+DEFINE_THEME("GRUVBOX", `
       :root {
           --color-dark:         #000000;
           --color-light-red:    #fb4934;
@@ -99,9 +110,9 @@ export const GRUVBOX = `
           --color-gray:         #a89984;
           --color-white:        #ebdbb2;
       }
-`
+`)
 
-export const MONOKAI = `
+DEFINE_THEME("MONOKAI", `
       :root {
           --color-dark:         #1e1e1e;
           --color-light-red:    #f92672;
@@ -122,9 +133,9 @@ export const MONOKAI = `
           --color-gray:         #f8f8f2;
           --color-white:        #f9f9f9;
       }
-`
+`)
 
-export const DRACULA = `
+DEFINE_THEME("DRACULA", `
       :root {
           --color-dark:         #1c1c1c;
           --color-light-red:    #ff5555;
@@ -145,9 +156,9 @@ export const DRACULA = `
           --color-gray:         #f8f8f2;
           --color-white:        #ffffff;
       }
-`
+`)
 
-export const MONOGREEN = `
+DEFINE_THEME("MONOGREEN", `
       :root {
           --color-dark:         #002200;
           --color-light-red:    #ff5c5c;
@@ -168,9 +179,9 @@ export const MONOGREEN = `
           --color-gray:         #b2b2b2;
           --color-white:        #ffffff;
       }
-`
+`)
 
-export const OCEANIC = `
+DEFINE_THEME("OCEANIC", `
       :root {
           --color-dark:         #2a3b4c;
           --color-light-red:    #ec5f67;
@@ -191,9 +202,9 @@ export const OCEANIC = `
           --color-gray:         #dfe1e8;
           --color-white:        #ffffff;
       }
-`
+`)
 
-export const TOKYO = `
+DEFINE_THEME("TOKYO", `
       :root {
           --color-dark:         #16161e;
           --color-light-red:    #f7768e;
@@ -214,9 +225,9 @@ export const TOKYO = `
           --color-gray:         #c0caf5;
           --color-white:        #ffffff;
       }
-`
+`)
 
-export const TOMORROW = `
+DEFINE_THEME("TOMORROW", `
       :root {
           --color-dark:         #1d1f21;
           --color-light-red:    #cc6666;
@@ -237,9 +248,9 @@ export const TOMORROW = `
           --color-gray:         #c5c8c6;
           --color-white:        #ffffff;
       }
-`
+`)
 
-export const RAILCAST = `
+DEFINE_THEME("RAILCAST", `
       :root {
           --color-dark:         #282828;
           --color-light-red:    #cc3333;
@@ -260,4 +271,4 @@ export const RAILCAST = `
           --color-gray:         #d3d0c8;
           --color-white:        #ffffff;
       }
-`
+`)

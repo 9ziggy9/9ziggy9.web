@@ -1,3 +1,4 @@
+import {RevealDir} from "./common"
 import * as common from "./common"
 
 const WIN_TOOL_BAR_HTML = `
@@ -19,21 +20,6 @@ const WIN_TOOL_BAR_HTML = `
   </div>
 `
 
-function _dropUtilityMenu(btn: HTMLElement, menu: HTMLElement): void {
-  /*
-    KNOWN BUG:
-    If resize happens after a button is pressed, this will lead to drift of
-    the menu. This is easy to understand, as there is no recomputation of
-    rectbtn.bottom and rectbtn.left.
-
-    TODO: Clicking outside closes dropdown. This should also fix bug.
-   */
-  menu.classList.toggle("hidden");
-  const rectbtn = btn.getBoundingClientRect();
-  menu.style.top  = `${rectbtn.bottom}px`;
-  menu.style.left = `${rectbtn.left}px`;
-}
-
 function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
   const {id, utilities, template} = spec;
   const root = common.getIdOrCry(id);
@@ -50,26 +36,19 @@ function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
     const uts = winbar.querySelector(".winbar-left");
     if (uts) {
       utilities.forEach(um => {
-        const menuBtn    = document.createElement("div");
-        const menuBtnLbl = document.createElement("span");
-        menuBtnLbl.innerText = um.title;
-        menuBtn.appendChild(menuBtnLbl);
-        menuBtn.classList.add("utility-menu-btn")
+        const btn    = document.createElement("div");
+        const btnLbl = document.createElement("span");
+        btnLbl.innerText = um.title;
+        btn.appendChild(btnLbl);
+        btn.classList.add("utility-menu-btn")
         const menu = document.createElement("div");
         menu.classList.add("utility-menu", "hidden");
         document.body.appendChild(menu);
-        menuBtn.addEventListener("click", () => {
-          _dropUtilityMenu(menuBtn, menu);
-          menuBtn.classList.toggle("utility-menu-btn-on");
+        btn.addEventListener("click", () => {
+          common.revealMenu(btn, menu, RevealDir.DOWN);
+          btn.classList.toggle("utility-menu-btn-on");
         });
-        document.addEventListener("click", (e) =>{
-          if (!menuBtn.contains(e.target as Node)
-            && !menu.contains(e.target as Node))
-          {
-            menu.classList.add("hidden");
-            menuBtn.classList.remove("utility-menu-btn-on");
-          }
-        });
+        common.hideOnUnboundedClick(btn, menu);
         for (const [lbl, fn] of Object.entries(um.fields)) {
           const div = document.createElement("div");
           div.classList.add("utility-menu-field-btn");
@@ -79,7 +58,7 @@ function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
           div.addEventListener("click", fn ? fn : () => {});
           menu.appendChild(div);
         }
-        uts.appendChild(menuBtn);
+        uts.appendChild(btn);
       })
     }
   }
