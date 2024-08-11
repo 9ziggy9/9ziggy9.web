@@ -2,3 +2,4 @@ Makefile.private
 .env
 node_modules/
 dist/
+css.old/

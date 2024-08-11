@@ -1,9 +1,4 @@
-import "../css/main.css"
-import "../css/anim.css"
-import "../css/topnav.css"
-import "../css/chat.css"
-import "../css/winbar.css"
-import "../css/utility-menu.css"
+import "../css/style.css"
 
 import * as common from "./common"
 import * as themes from "./themes"

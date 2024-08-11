@@ -22,8 +22,8 @@ export function bootstrap(): ThemeController {
       theme.active = true;
     },
     cycleCurrent: (curr: HTMLElement) =>  {
-      if (_curr) _curr.classList.remove("theme-selection-on");
-      curr.classList.add("theme-selection-on");
+      if (_curr) _curr.classList.remove("color-theme-btn-on");
+      curr.classList.add("color-theme-btn-on");
       _curr = curr;
     }
   };
