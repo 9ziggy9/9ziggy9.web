@@ -5,7 +5,7 @@
   font-size       : $FONT_SZ_MIN;
   color           : $CLR_WHITE;
   text-decoration : none;
-  &:hover  { @include color_pair($CLR_DGRAY, $CLR_GREEN); }
+  &:hover  { @include color_pair($CLR_DARK,  $CLR_GREEN); }
   &.active { @include color_pair($CLR_GREEN, $CLR_BLACK); }
 }
 

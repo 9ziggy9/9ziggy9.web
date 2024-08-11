@@ -1,6 +1,6 @@
 type cssAnim = { in: string, out: string, dt: number };
 
-type UtilityFields = {
+type UtilityActions = {
   [k: string]: ((this: HTMLDivElement, ev: MouseEvent) => any) | null;
 }
 
@@ -12,10 +12,7 @@ interface ThemeController {
   cycleCurrent: (HTMLElement) => void;
 }
 
-interface UtilityMenu {
-  title: string;
-  fields: UtilityFields;
-}
+interface UtilityMenu { title: string; actions: UtilityActions; }
 
 interface ViewScaleDims { width?: string; height?: string; }
 
@@ -39,13 +36,18 @@ interface WindowView {
   spec: ViewSpec;
 }
 
+interface TargetContext {
+  target:  WindowView;
+  proceed: (fn: (WindowView) => void) => void;
+}
+
 interface MasterView {
   fullscreenView:   HTMLElement | null,
   mainView:         HTMLElement | null,
-  _windowTable:      { [string]: WindowView },
+  _windowTable:     { [string]: WindowView },
 
-  toggleMain:       (id: string)     => void,
-  toggleFullscreen: (id: string)     => void,
   windowFrom:       (spec: ViewSpec) => WindowView | null,
   getWindow:        (id: string)     => WindowView,
+  toggleMain:       (id: string)     => TargetContext,
+  toggleFullscreen: (id: string)     => TargetContext,
 }

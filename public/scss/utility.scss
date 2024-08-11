@@ -23,8 +23,8 @@
     }
 }
 
-.color-theme-btn {
+#color-theme-btn {
     radius: 0.25rem;
     z-index: 2;
-    &-on { @include color_pair($CLR_BLUE, $CLR_BLACK); }
+    &:hover { color: $CLR_GREEN; }
 }

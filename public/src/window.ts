@@ -49,7 +49,7 @@ function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
           btn.classList.toggle("utility-menu-btn-on");
         });
         common.hideOnUnboundedClick(btn, menu);
-        for (const [lbl, fn] of Object.entries(um.fields)) {
+        for (const [lbl, fn] of Object.entries(um.actions)) {
           common.constructMenuField(menu, lbl, fn);
         }
         uts.appendChild(btn);
@@ -83,7 +83,9 @@ function _wrapWin(spec: ViewSpec, mv: MasterView): WindowView | null {
   root?.classList.add("hidden", "view-win");
   root
     ?.querySelector(".winbar-close")
-    ?.addEventListener("click", () => mv.toggleMain(spec.name));
+    ?.addEventListener("click", () => mv
+      .toggleMain(spec.name)
+      .proceed((vw: WindowView) => console.log(vw)));
   root
     ?.querySelector(".winbar-min-max")
     ?.addEventListener("click", () => mv.toggleFullscreen(spec.name));
@@ -120,37 +122,55 @@ function _createMasterView(initId: string): MasterView {
     mainView: common.getIdOrCry(initId),
     _windowTable: {},
 
-    getWindow: function(name: string): WindowView {
+    getWindow:
+    function(name: string): WindowView {
       return (this._windowTable as any)[name];
     },
 
-    toggleMain: async function(name: string) {
+    toggleMain: function(name: string): TargetContext {
       const vw = this.getWindow(name);
-      if (!vw) return;
-      await _classSwitch("hidden", vw.root, this.mainView, {
-        in:  "win-pop-view-in",
-        out: "win-pop-view-out",
-        dt:  150
-      });
-      if (vw.root.classList.contains("fullscreen")) {
-        _setSizing(vw); 
-        vw.root.classList.remove("fullscreen");
-      }
+      if (!vw) return {
+        target: vw,
+        proceed: (fn) => fn(vw),
+      };
+      (async () => {
+        await _classSwitch("hidden", vw.root, this.mainView, {
+          in:  "win-pop-view-in",
+          out: "win-pop-view-out",
+          dt:  150
+        });
+        if (vw.root.classList.contains("fullscreen")) {
+          _setSizing(vw); 
+        }
+      })();
+      return {
+        target: vw,
+        proceed: (fn) => fn(vw),
+      };
     },
 
-    toggleFullscreen: async function(name: string) {
+    toggleFullscreen: function(name: string): TargetContext {
       const vw = this.getWindow(name);
-      if (!vw) return;
-      await _classSwitch("fullscreen", vw.root, this.fullscreenView, {
-        in:  "fullscreen-view-in",
-        out: "fullscreen-view-out",
-        dt:  150
-      });
+      if (!vw) return {
+        target: vw,
+        proceed: (fn) => fn(vw),
+      };
+      (async () => {
+        await _classSwitch("fullscreen", vw.root, this.fullscreenView, {
+          in:  "fullscreen-view-in",
+          out: "fullscreen-view-out",
+          dt:  150
+        });
       _setSizing(
         vw, vw.root.classList.contains("fullscreen")
           ? ({ default: { width: "100%", height: "100%" },
                max:     { width: "100%", height: "100%" }})
           : undefined );
+      })();
+      return {
+        target: vw,
+        proceed: (fn) => fn(vw),
+      };
     },
 
     windowFrom: function(spec: ViewSpec): WindowView | null {

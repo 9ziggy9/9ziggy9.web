@@ -5,7 +5,9 @@ import * as themes from "./themes"
 import * as    win from "./window"
 
 function viewMountHandler(id: string, ev: string, fn: EventListener): void {
-  common.getIdOrCry(id)?.addEventListener(ev, fn);
+  const btn = common.getIdOrCry(id);
+  if (!btn) return;
+  btn.addEventListener(ev, fn);
 }
 
 function loadThemes(): void {
@@ -45,12 +47,13 @@ function main(): void {
     },
     utilities: [
       {
-        title: "actions",
-        fields: {
+        title: "run",
+        actions: {
           connect: () => console.log("connecting ..."),
           name:    null,
           exit: () => {
-            mv.toggleMain("chat");
+            mv.toggleMain("chat")
+              .proceed(() => console.log("exited..."));
             Array.from(document.getElementsByClassName("utility-menu"))
               .forEach((el) => el.classList.add("hidden"));
           }
@@ -59,7 +62,7 @@ function main(): void {
     ]
   });
 
-  viewMountHandler("view-chat-btn",  "click", () => mv.toggleMain("chat"));
+  viewMountHandler("view-chat-btn", "click", () => mv.toggleMain("chat"));
 }
 
 window.onload = main
