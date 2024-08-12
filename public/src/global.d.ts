@@ -1,7 +1,8 @@
 type cssAnim = { in: string, out: string, dt: number };
 
+type UtilityAction = ((this: HTMLDivElement, ev: MouseEvent) => any) | null
 type UtilityActions = {
-  [k: string]: ((this: HTMLDivElement, ev: MouseEvent) => any) | null;
+  [k: string]: UtilityAction;
 }
 
 type ThemeState   = { css: string, active: boolean };
@@ -22,32 +23,44 @@ interface ViewScalingTable {
   max?:     ViewScaleDims;
 }
 
-interface ViewSpec {
-  id: string;
-  name: string;
+interface WinSpec {
+  id      : string;
+  name    : string;
+  toggle? : Toggler;
+  fullscreen?: () => void;
+  exit?:       () => void;
   template?: string;
   scales?: ViewScalingTable;
   utilities?: UtilityMenu[];
 }
 
 interface WindowView {
-  id:   string;
-  root: HTMLElement;
-  spec: ViewSpec;
+  id      : string;
+  root    : HTMLElement;
+  spec    : WinSpec;
+  toggle? : Toggler;
 }
 
-interface TargetContext {
-  target:  WindowView;
-  proceed: (fn: (WindowView) => void) => void;
+interface TogglerSpec {
+  winName:        string,
+  classId:        string,
+  transition?:    [string, string, number],
+  onToggle?:      (w: WindowView, v: HTMLElement | null) => void,
 }
+
+type Toggler = () => void;
 
 interface MasterView {
+  viewTable:        { [n: string]: HTMLElement | null },
   fullscreenView:   HTMLElement | null,
-  mainView:         HTMLElement | null,
   _windowTable:     { [string]: WindowView },
 
-  windowFrom:       (spec: ViewSpec) => WindowView | null,
+  togglers:         { [n: string]: Toggler },
+  attachToggler:    (spec: TogglerSpec) => Toggler,
+
+  windowFrom:       (spec: WinSpec) => WindowView | null,
   getWindow:        (id: string)     => WindowView,
-  toggleMain:       (id: string)     => TargetContext,
-  toggleFullscreen: (id: string)     => TargetContext,
+  resetSizes:       (vw: WindowView, orr?: ViewScalingTable) => void,
+
+  toggleFullscreen: (id: string)     => void,
 }

@@ -35,6 +35,7 @@ function loadThemes(): void {
 
 function main(): void {
   const mv: MasterView = win.createMasterView();
+
   loadThemes();
 
   mv.windowFrom({
@@ -45,24 +46,33 @@ function main(): void {
       default: { width: "90%",    height: "90%" },
       max:     { width: "1280px", height: "1040px" }
     },
+    exit: function() {
+      if (this.toggle) this.toggle();
+      Array.from(document.getElementsByClassName("utility-menu"))
+        .forEach((el) => el.classList.add("hidden"));
+    },
     utilities: [
       {
         title: "run",
         actions: {
           connect: () => console.log("connecting ..."),
           name:    null,
-          exit: () => {
-            mv.toggleMain("chat")
-              .proceed(() => console.log("exited..."));
-            Array.from(document.getElementsByClassName("utility-menu"))
-              .forEach((el) => el.classList.add("hidden"));
-          }
         }
       },
     ]
   });
 
-  viewMountHandler("view-chat-btn", "click", () => mv.toggleMain("chat"));
+  mv.attachToggler({
+    winName: "chat",
+    classId:  "hidden",
+    transition: ["win-pop-view-in", "win-pop-view-out", 150],
+    onToggle: (vw) => {
+      if (vw.root.classList.contains("fullscreen")) mv.resetSizes(vw);
+    },
+  }),
+
+  viewMountHandler("view-chat-btn", "click",
+                   () => (mv.getWindow("chat").toggle as Toggler)());
 }
 
 window.onload = main

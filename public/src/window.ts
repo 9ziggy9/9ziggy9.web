@@ -1,26 +1,45 @@
 import {RevealDir} from "./common"
 import * as common from "./common"
 
-const WIN_TOOL_BAR_HTML = `
-  <div class="winbar">
-    <div class="winbar-left"></div>
-    <div class="winbar-right">
-      <div class="winbar-min-max">
-        <span class="material-symbols-outlined">
-          fullscreen
-        </span>
-        <span class="hidden material-symbols-outlined">
-          close_fullscreen
+function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined | null {
+  const WIN_TOOL_BAR_HTML = `
+    <div class="winbar">
+      <div class="winbar-left"></div>
+      <div class="winbar-right">
+        <div class="winbar-min-max">
+          <span class="material-symbols-outlined" id="fullscreen-open">
+            fullscreen
+          </span>
+          <span class="hidden material-symbols-outlined" id="fullscreen-close">
+            close_fullscreen
+          </span>
+        </div>
+        <span class="winbar-close material-symbols-outlined" id="winbar-close">
+          close
         </span>
       </div>
-      <span class="winbar-close material-symbols-outlined">
-        close
-      </span>
     </div>
-  </div>
-`
+  `
+  const CONSTRUCT_UTILITY_MENU_BTNS = (uts: Element, um: UtilityMenu) => {
+    const btn    = document.createElement("div");
+    const btnLbl = document.createElement("span");
+    btnLbl.innerText = um.title;
+    btn.appendChild(btnLbl);
+    btn.classList.add("utility-menu-btn")
+    const menu = document.createElement("div");
+    menu.classList.add("utility-menu", "hidden");
+    document.body.appendChild(menu);
+    btn.addEventListener("click", () => {
+      common.revealMenu(btn, menu, RevealDir.DOWN);
+      btn.classList.toggle("utility-menu-btn-on");
+    });
+    common.hideOnUnboundedClick(btn, menu);
+    for (const [lbl, fn] of Object.entries(um.actions)) {
+      common.constructMenuField(menu, lbl, fn);
+    }
+    uts.appendChild(btn);
+  }
 
-function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
   const {id, utilities, template} = spec;
   const root = common.getIdOrCry(id);
   if (!root) return;
@@ -33,34 +52,31 @@ function _injectToolbar(spec: ViewSpec): HTMLElement | undefined | null {
   const winbar = winbarContainer.querySelector(".winbar");
   if (winbar) root.insertBefore(winbar, root.firstChild);
   if (utilities && winbar) {
-    const uts = winbar.querySelector(".winbar-left");
-    if (uts) {
+    const barLeft = winbar.querySelector(".winbar-left");
+    if (barLeft) {
       utilities.forEach(um => {
-        const btn    = document.createElement("div");
-        const btnLbl = document.createElement("span");
-        btnLbl.innerText = um.title;
-        btn.appendChild(btnLbl);
-        btn.classList.add("utility-menu-btn")
-        const menu = document.createElement("div");
-        menu.classList.add("utility-menu", "hidden");
-        document.body.appendChild(menu);
-        btn.addEventListener("click", () => {
-          common.revealMenu(btn, menu, RevealDir.DOWN);
-          btn.classList.toggle("utility-menu-btn-on");
-        });
-        common.hideOnUnboundedClick(btn, menu);
-        for (const [lbl, fn] of Object.entries(um.actions)) {
-          common.constructMenuField(menu, lbl, fn);
-        }
-        uts.appendChild(btn);
-      })
+        CONSTRUCT_UTILITY_MENU_BTNS(barLeft, um);
+      });
     }
+    root
+      ?.querySelector("#winbar-close")
+      ?.addEventListener("click", () => {
+        if (spec.exit) spec.exit();
+        root.classList.remove("fullscreen");
+        root.style.maxWidth  = spec.scales?.max?.width      as string;
+        root.style.maxHeight = spec.scales?.max?.height     as string;
+        root.style.width     = spec.scales?.default?.width  as string;
+        root.style.height    = spec.scales?.default?.height as string;
+      });
+    root
+      ?.querySelector(".winbar-min-max")
+      ?.addEventListener("click", () => mv.toggleFullscreen(spec.name));
   }
   else console.error("No element with 'winbar' found in HTML.");
   return root;
 }
 
-function _setSizing(vw: WindowView, override?: ViewScalingTable) {
+function _resetSizes(vw: WindowView, override?: ViewScalingTable) {
   /* TODO:
      incorporate appropriate testing so that minWidth/height can be
      appropriately utilized, omitting for simplicity for the time being.
@@ -73,24 +89,15 @@ function _setSizing(vw: WindowView, override?: ViewScalingTable) {
   vw.root.style.height    = source.default?.height as string;
 }
 
-function _wrapWin(spec: ViewSpec, mv: MasterView): WindowView | null {
-  const root = _injectToolbar(spec);
+function _wrapWin(spec: WinSpec, mv: MasterView): WindowView | null {
+  const root = _injectToolbar(spec, mv);
   if (!root) {
     console.error("failed to inject into root view div!");
     return null;
   }
-  // TODO: abstract this into ViewSpec as well
   root?.classList.add("hidden", "view-win");
-  root
-    ?.querySelector(".winbar-close")
-    ?.addEventListener("click", () => mv
-      .toggleMain(spec.name)
-      .proceed((vw: WindowView) => console.log(vw)));
-  root
-    ?.querySelector(".winbar-min-max")
-    ?.addEventListener("click", () => mv.toggleFullscreen(spec.name));
   const vw = { id: spec.id, root, spec };
-  _setSizing(vw);
+  _resetSizes(vw);
   return vw
 }
 
@@ -118,62 +125,59 @@ async function _classSwitch(
 
 function _createMasterView(initId: string): MasterView {
   return {
-    fullscreenView: null,
-    mainView: common.getIdOrCry(initId),
-    _windowTable: {},
+    fullscreenView : null,
+    viewTable      : { desktop: common.getIdOrCry(initId), },
+    togglers       : {},
+    _windowTable   : {},
 
     getWindow:
     function(name: string): WindowView {
       return (this._windowTable as any)[name];
     },
 
-    toggleMain: function(name: string): TargetContext {
-      const vw = this.getWindow(name);
-      if (!vw) return {
-        target: vw,
-        proceed: (fn) => fn(vw),
+    resetSizes: _resetSizes,
+
+    attachToggler:
+    function ({classId, winName, transition, onToggle}): Toggler {
+      const win  = this.getWindow(winName);
+      const view = this.viewTable.desktop;
+      if (!win) return () => {
+        console.warn("No toggler defined.");
       };
-      (async () => {
-        await _classSwitch("hidden", vw.root, this.mainView, {
-          in:  "win-pop-view-in",
-          out: "win-pop-view-out",
-          dt:  150
-        });
-        if (vw.root.classList.contains("fullscreen")) {
-          _setSizing(vw); 
-        }
-      })();
-      return {
-        target: vw,
-        proceed: (fn) => fn(vw),
+      const toggler = () => {
+        (async () => {
+          await _classSwitch(classId, win.root, view, {
+            in:  transition ? transition[0] : "",
+            out: transition ? transition[1] : "",
+            dt:  transition ? transition[2] : 0,
+          });
+          if (onToggle) onToggle(win, view);
+        })();
       };
+      win.spec.toggle = toggler;
+      win.toggle = toggler;
+      return toggler;
     },
 
-    toggleFullscreen: function(name: string): TargetContext {
+    toggleFullscreen:
+    function(name: string): void {
       const vw = this.getWindow(name);
-      if (!vw) return {
-        target: vw,
-        proceed: (fn) => fn(vw),
-      };
+      if (!vw) return;
       (async () => {
         await _classSwitch("fullscreen", vw.root, this.fullscreenView, {
           in:  "fullscreen-view-in",
           out: "fullscreen-view-out",
           dt:  150
         });
-      _setSizing(
+      this.resetSizes(
         vw, vw.root.classList.contains("fullscreen")
           ? ({ default: { width: "100%", height: "100%" },
                max:     { width: "100%", height: "100%" }})
           : undefined );
       })();
-      return {
-        target: vw,
-        proceed: (fn) => fn(vw),
-      };
     },
 
-    windowFrom: function(spec: ViewSpec): WindowView | null {
+    windowFrom: function(spec: WinSpec): WindowView | null {
       console.error("UNIMPLEMENTED: did you call createMasterView?");
       return null;
     },
@@ -183,7 +187,7 @@ function _createMasterView(initId: string): MasterView {
 
 export function createMasterView(initId: string = "view-desktop"): MasterView {
   const mv = _createMasterView(initId);
-  mv.windowFrom = (spec: ViewSpec) => {
+  mv.windowFrom = (spec: WinSpec) => {
     const vw = _wrapWin(spec, mv);
     if (!vw) {
       console.error("_wrapWin internal injection error");
