@@ -1,19 +1,22 @@
-import {RevealDir} from "./common"
+import {RevealDir, MouseFlag} from "./common"
 import * as common from "./common"
 
 function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined | null {
   const WIN_TOOL_BAR_HTML = `
     <div class="winbar">
       <div class="winbar-left"></div>
+      ${spec.header ? `<div>${spec.header}</div>`: ""}
       <div class="winbar-right">
-        <div class="winbar-min-max">
-          <span class="material-symbols-outlined" id="fullscreen-open">
-            fullscreen
-          </span>
-          <span class="hidden material-symbols-outlined" id="fullscreen-close">
-            close_fullscreen
-          </span>
-        </div>
+      ${spec.fullscreenable ?
+            `<div class="winbar-min-max">
+                <span class="material-symbols-outlined" id="fullscreen-open">
+                  fullscreen
+                </span>
+                <span class="hidden material-symbols-outlined"
+                      id="fullscreen-close">
+                  close_fullscreen
+                </span>
+              </div>`: ""}
         <span class="winbar-close material-symbols-outlined" id="winbar-close">
           close
         </span>
@@ -33,7 +36,13 @@ function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined 
       common.revealMenu(btn, menu, RevealDir.DOWN);
       btn.classList.toggle("utility-menu-btn-on");
     });
-    common.hideOnUnboundedClick(btn, menu);
+    common.hideMenuOnMouseEvent(
+      MouseFlag.UNBOUNDED_CLICK |
+      MouseFlag.BOUNDED_CLICK   |
+      MouseFlag.MOUSE_EXIT,
+      btn, menu
+    );
+
     for (const [lbl, fn] of Object.entries(um.actions)) {
       common.constructMenuField(menu, lbl, fn);
     }
@@ -51,10 +60,10 @@ function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined 
   winbarContainer.innerHTML = WIN_TOOL_BAR_HTML;
   const winbar = winbarContainer.querySelector(".winbar");
   if (winbar) root.insertBefore(winbar, root.firstChild);
-  if (utilities && winbar) {
+  if (winbar) {
     const barLeft = winbar.querySelector(".winbar-left");
     if (barLeft) {
-      utilities.forEach(um => {
+      utilities?.forEach(um => {
         CONSTRUCT_UTILITY_MENU_BTNS(barLeft, um);
       });
     }
@@ -68,11 +77,12 @@ function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined 
         root.style.width     = spec.scales?.default?.width  as string;
         root.style.height    = spec.scales?.default?.height as string;
       });
-    root
-      ?.querySelector(".winbar-min-max")
-      ?.addEventListener("click", () => mv.toggleFullscreen(spec.name));
-  }
-  else console.error("No element with 'winbar' found in HTML.");
+    if (spec.fullscreenable) {
+      root
+        ?.querySelector(".winbar-min-max")
+        ?.addEventListener("click", () => mv.toggleFullscreen(spec.name));
+    }
+  } else console.error("No element with 'winbar' found in HTML.");
   return root;
 }
 
@@ -137,9 +147,7 @@ function _createMasterView(initId: string): MasterView {
     attachToggler:
     function ({classId, winName, transition, onToggle}): Toggler {
       const win  = this.getWindow(winName);
-      if (!win) return () => {
-        console.warn("No toggler defined.");
-      };
+      if (!win) return () => console.warn("No toggler defined.");
       const toggler = () => {
         (async () => {
           await _classSwitch(classId, win.root, {

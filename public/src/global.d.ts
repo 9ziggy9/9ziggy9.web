@@ -26,12 +26,13 @@ interface ViewScalingTable {
 interface WinSpec {
   id      : string;
   name    : string;
+  header?   : string;
   toggle? : Toggler;
-  fullscreen?: () => void;
-  exit?:       () => void;
+  exit?   : () => void;
   template?: string;
   scales?: ViewScalingTable;
   utilities?: UtilityMenu[];
+  fullscreenable?: boolean;
 }
 
 interface WindowView {

@@ -1,7 +1,7 @@
 export enum RevealDir {
   DOWN = "bottom",
   UP   = "top",
-}
+};
 
 export function getIdOrCry(id: string): HTMLElement | null {
   const el: HTMLElement | null = document.getElementById(id);
@@ -18,13 +18,43 @@ export function getIdOrDie(id: string): HTMLElement | null {
   return el;
 }
 
-export function hideOnUnboundedClick(btn: HTMLElement, menu: HTMLElement) {
-  document.addEventListener("click", (e) =>{
-    if (!btn.contains(e.target as Node) && !menu.contains(e.target as Node)) {
-      menu.classList.add("hidden");
-      btn.classList.remove("utility-menu-btn-on");
-    }
-  });
+export enum MouseFlag {
+  UNBOUNDED_CLICK = 1 << 0,
+  BOUNDED_CLICK   = 1 << 1,
+  MOUSE_EXIT      = 1 << 2,
+};
+
+export function hideMenuOnMouseEvent(
+  ef: MouseFlag, btn: HTMLElement, menu: HTMLElement
+): void {
+  const MOUNT_PRED
+    = (pred: boolean, menu: HTMLElement, btn: HTMLElement) => {
+      if (pred) {
+        menu.classList.add("hidden");
+        btn.classList.remove("utility-menu-btn-on");
+      }
+    };
+  if (ef & MouseFlag.UNBOUNDED_CLICK) {
+    document.addEventListener("click", (e) => {
+      MOUNT_PRED(
+        !btn.contains(e.target as Node) && !menu.contains(e.target as Node),
+        menu, btn,
+      )
+    });
+  }
+  if (ef & MouseFlag.BOUNDED_CLICK) {
+    document.addEventListener("click", (e) =>{
+      MOUNT_PRED(menu.contains(e.target as Node), menu, btn);
+    });
+  }
+  if (ef & MouseFlag.MOUSE_EXIT) {
+    document.addEventListener("mousemove", (e) => {
+      MOUNT_PRED(
+        !btn.contains(e.target as Node) && !menu.contains(e.target as Node),
+        menu, btn,
+      )
+    });
+  }
 }
 
 export function revealMenu(

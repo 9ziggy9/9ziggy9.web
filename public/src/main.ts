@@ -29,7 +29,10 @@ function loadThemes(): void {
       common.revealMenu(btn, menu, common.RevealDir.UP);
       btn.classList.toggle("utility-menu-btn-on");
     });
-    common.hideOnUnboundedClick(btn, menu);
+    common.hideMenuOnMouseEvent(
+      common.MouseFlag.UNBOUNDED_CLICK,
+      btn, menu
+    );
   }
 }
 
@@ -39,15 +42,39 @@ function main(): void {
   loadThemes();
 
   mv.windowFrom({
+    id: "view-chat-uname",
+    template: "--templ-view-chat-uname",
+    name: "chat-uname",
+    header: "enter username",
+    exit: function() { if (this.toggle) this.toggle(); },
+    scales: {
+      default: { width: "30%",    height: "10%" },
+      max:     { width: "1280px", height: "1040px" }
+    },
+  })
+
+  mv.attachToggler({
+    winName: "chat-uname",
+    classId: "hidden",
+    transition: ["win-pop-view-in", "win-pop-view-out", 150],
+    onToggle: () => {
+      document.getElementById("chat-uname-in")?.focus();
+    }
+  }),
+
+  mv.windowFrom({
     id: "view-chat",
     template: "--templ-view-chat",
     name: "chat",
+    header: "chat",
+    fullscreenable: true,
     scales: {
       default: { width: "90%",    height: "90%" },
       max:     { width: "1280px", height: "1040px" }
     },
     exit: function() {
       if (this.toggle) this.toggle();
+      mv.getWindow("chat-uname").root.classList.add("hidden");
       Array.from(document.getElementsByClassName("utility-menu"))
         .forEach((el) => el.classList.add("hidden"));
     },
@@ -56,7 +83,7 @@ function main(): void {
         title: "run",
         actions: {
           connect: () => console.log("connecting ..."),
-          name:    null,
+          name:    () => (mv.getWindow("chat-uname").toggle as Toggler)(),
         }
       },
     ]
