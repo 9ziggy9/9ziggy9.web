@@ -518,4 +518,9 @@ body {
   color: var(--color-green);
 }
 
+.color-theme-btn-on {
+  background-color: var(--color-blue);
+  color: var(--color-black);
+}
+
 /*# sourceMappingURL=style.css.map */

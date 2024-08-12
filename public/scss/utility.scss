@@ -28,3 +28,7 @@
     z-index: 2;
     &:hover { color: $CLR_GREEN; }
 }
+
+.color-theme-btn-on {
+    @include color_pair($CLR_BLUE, $CLR_BLACK);
+}
