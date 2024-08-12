@@ -45,14 +45,14 @@ interface TogglerSpec {
   winName:        string,
   classId:        string,
   transition?:    [string, string, number],
-  onToggle?:      (w: WindowView, v: HTMLElement | null) => void,
+  onToggle?:      (w: WindowView) => void,
 }
 
 type Toggler = () => void;
 
 interface MasterView {
   viewTable:        { [n: string]: HTMLElement | null },
-  fullscreenView:   HTMLElement | null,
+  _fullscreenView:   HTMLElement | null,
   _windowTable:     { [string]: WindowView },
 
   togglers:         { [n: string]: Toggler },

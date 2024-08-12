@@ -40,6 +40,11 @@
     align-items     : center;
 }
 
+@mixin transflate($t, $l, $tt, $tl) {
+    top: $t; left: $l;
+    transform: translate($tt, $tl);
+}
+
 $FONT_SZ_STD: 2rem;
 $FONT_SZ_MIN: 1.5rem;
 $FONT_SZ_TNY: 1rem;

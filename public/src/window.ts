@@ -102,8 +102,7 @@ function _wrapWin(spec: WinSpec, mv: MasterView): WindowView | null {
 }
 
 async function _classSwitch(
-  className: string, viewMe: HTMLElement, view: HTMLElement | null,
-  anim?: cssAnim,
+  className: string, viewMe: HTMLElement, anim?: cssAnim,
 ): Promise<void> {
   const vmClasses = viewMe.classList;
   if (!vmClasses.contains(className) && anim) {
@@ -112,23 +111,21 @@ async function _classSwitch(
       setTimeout(() => {
         vmClasses.remove(anim.out);
         vmClasses.add(className, anim.in);
-        view?.classList.toggle(className);
         res();
       }, anim.dt);
     })
   } else {
     if (anim) vmClasses?.add(anim.in);
     vmClasses?.toggle(className);
-    view?.classList.toggle(className);
   }
 }
 
 function _createMasterView(initId: string): MasterView {
   return {
-    fullscreenView : null,
-    viewTable      : { desktop: common.getIdOrCry(initId), },
-    togglers       : {},
-    _windowTable   : {},
+    _fullscreenView : null,
+    viewTable       : { desktop: common.getIdOrCry(initId), },
+    togglers        : {},
+    _windowTable    : {},
 
     getWindow:
     function(name: string): WindowView {
@@ -140,18 +137,17 @@ function _createMasterView(initId: string): MasterView {
     attachToggler:
     function ({classId, winName, transition, onToggle}): Toggler {
       const win  = this.getWindow(winName);
-      const view = this.viewTable.desktop;
       if (!win) return () => {
         console.warn("No toggler defined.");
       };
       const toggler = () => {
         (async () => {
-          await _classSwitch(classId, win.root, view, {
+          await _classSwitch(classId, win.root, {
             in:  transition ? transition[0] : "",
             out: transition ? transition[1] : "",
             dt:  transition ? transition[2] : 0,
           });
-          if (onToggle) onToggle(win, view);
+          if (onToggle) onToggle(win);
         })();
       };
       win.spec.toggle = toggler;
@@ -164,7 +160,7 @@ function _createMasterView(initId: string): MasterView {
       const vw = this.getWindow(name);
       if (!vw) return;
       (async () => {
-        await _classSwitch("fullscreen", vw.root, this.fullscreenView, {
+        await _classSwitch("fullscreen", vw.root, {
           in:  "fullscreen-view-in",
           out: "fullscreen-view-out",
           dt:  150
