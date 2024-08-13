@@ -24,15 +24,17 @@ interface ViewScalingTable {
 }
 
 interface WinSpec {
-  id      : string;
-  name    : string;
-  header?   : string;
-  toggle? : Toggler;
-  exit?   : () => void;
-  template?: string;
-  scales?: ViewScalingTable;
-  utilities?: UtilityMenu[];
-  fullscreenable?: boolean;
+  id              : string;
+  name            : string;
+  color?          : string;
+  bgColor?        : string;
+  header?         : string;
+  toggle?         : Toggler;
+  exit?           : () => void;
+  template?       : string;
+  scales?         : ViewScalingTable;
+  utilities?      : UtilityMenu[];
+  fullscreenable? : boolean;
 }
 
 interface WindowView {

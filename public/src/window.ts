@@ -59,6 +59,12 @@ function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined 
   const winbarContainer = document.createElement("div");
   winbarContainer.innerHTML = WIN_TOOL_BAR_HTML;
   const winbar = winbarContainer.querySelector(".winbar");
+
+  if (spec.bgColor) {
+    (winbar as HTMLElement).style.backgroundColor = spec.bgColor;
+  }
+  if (spec.color) (winbar as HTMLElement).style.backgroundColor = spec.color;
+
   if (winbar) root.insertBefore(winbar, root.firstChild);
   if (winbar) {
     const barLeft = winbar.querySelector(".winbar-left");
@@ -74,6 +80,8 @@ function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined 
         root.classList.remove("fullscreen");
         root.style.maxWidth  = spec.scales?.max?.width      as string;
         root.style.maxHeight = spec.scales?.max?.height     as string;
+        root.style.minWidth  = spec.scales?.min?.width      as string;
+        root.style.minHeight = spec.scales?.min?.height     as string;
         root.style.width     = spec.scales?.default?.width  as string;
         root.style.height    = spec.scales?.default?.height as string;
       });
@@ -95,6 +103,8 @@ function _resetSizes(vw: WindowView, override?: ViewScalingTable) {
   if (!source) return;
   vw.root.style.maxWidth  = source.max?.width      as string;
   vw.root.style.maxHeight = source.max?.height     as string;
+  vw.root.style.minWidth  = source.min?.width      as string;
+  vw.root.style.minHeight = source.min?.height     as string;
   vw.root.style.width     = source.default?.width  as string;
   vw.root.style.height    = source.default?.height as string;
 }
@@ -106,6 +116,7 @@ function _wrapWin(spec: WinSpec, mv: MasterView): WindowView | null {
     return null;
   }
   root?.classList.add("hidden", "view-win");
+  if (spec.bgColor) root.style.borderColor = spec.bgColor;
   const vw = { id: spec.id, root, spec };
   _resetSizes(vw);
   return vw

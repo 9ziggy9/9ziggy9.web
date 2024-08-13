@@ -45,7 +45,8 @@ function main(): void {
     id: "view-chat-uname",
     template: "--templ-view-chat-uname",
     name: "chat-uname",
-    header: "enter username",
+    header: "username",
+    bgColor: "var(--color-blue)",
     exit: function() { if (this.toggle) this.toggle(); },
     scales: {
       default: { width: "30%",    height: "10%" },

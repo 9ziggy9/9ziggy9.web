@@ -11,7 +11,7 @@
 
 .view-win {
     @include grid_win;
-    border        : medium solid var(--color-green);
+    border        : 0.125rem solid $CLR_GREEN;
     border-radius : 0.5rem;
 }
 
@@ -28,5 +28,8 @@
     }
     &-right {
         span:hover { font-size: 1.25rem; }
+    }
+    &-close {
+        width: 100%;
     }
 }
