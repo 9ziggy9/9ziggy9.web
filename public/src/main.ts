@@ -3,6 +3,7 @@ import "../css/style.css"
 import * as common from "./common"
 import * as themes from "./themes"
 import * as    win from "./window"
+import * as   chat from "./chat"
 
 function viewMountHandler(id: string, ev: string, fn: EventListener): void {
   const btn = common.getIdOrCry(id);
@@ -36,11 +37,7 @@ function loadThemes(): void {
   }
 }
 
-function main(): void {
-  const mv: MasterView = win.createMasterView();
-
-  loadThemes();
-
+function attachWindows(mv: MasterView, ch: chat.Session): void {
   mv.windowFrom({
     id: "view-chat-uname",
     template: "--templ-view-chat-uname",
@@ -52,7 +49,7 @@ function main(): void {
       default: { width: "30%",    height: "10%" },
       max:     { width: "1280px", height: "1040px" }
     },
-  })
+  });
 
   mv.attachToggler({
     winName: "chat-uname",
@@ -61,7 +58,7 @@ function main(): void {
     onToggle: () => {
       document.getElementById("chat-uname-in")?.focus();
     }
-  }),
+  });
 
   mv.windowFrom({
     id: "view-chat",
@@ -84,7 +81,35 @@ function main(): void {
         title: "run",
         actions: {
           connect: () => console.log("connecting ..."),
-          name:    () => (mv.getWindow("chat-uname").toggle as Toggler)(),
+          name:    () => {
+            const chatNameIn
+              = common.getIdOrCry("chat-uname-in") as HTMLInputElement;
+            const chatUnameWin = mv.getWindow("chat-uname");
+            if (!ch.isInitialized.input) {
+              console.log("initializing chat input ... ");
+              if (!chatNameIn) throw Error("couldn't get chat input");
+              chatNameIn.addEventListener("keydown", e => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  const res = ch.setUsername(chatNameIn.value);
+                  if (!res.success) return console.error(res.error);
+                  console.log(ch.getUsername());
+                  (chatUnameWin.toggle as Toggler)();
+
+                  const chstream
+                    = document.getElementById("chat-stream-msg-container");
+
+                  if (chstream) {
+                    chstream.appendChild(
+                      ch.genMessage("hello, now we have a message!")
+                    );
+                  }
+                }
+              });
+              ch.isInitialized.input = true;
+            }
+            (chatUnameWin.toggle as Toggler)();
+          }
         }
       },
     ]
@@ -97,10 +122,20 @@ function main(): void {
     onToggle: (vw) => {
       if (vw.root.classList.contains("fullscreen")) mv.resetSizes(vw);
     },
-  }),
+  });
+}
+
+function main(): void {
+  const mv: MasterView = win.createMasterView();
+  loadThemes();
+
+  const chSession = chat.startSession();
+  attachWindows(mv, chSession);
+  chat.INIT_MSG_INPUT(chSession);
 
   viewMountHandler("view-chat-btn", "click",
                    () => (mv.getWindow("chat").toggle as Toggler)());
+
 }
 
 window.onload = main

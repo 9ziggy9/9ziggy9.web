@@ -311,7 +311,7 @@ body {
 }
 .chat-stream-display {
   display: grid;
-  grid-template-columns: 9fr 1fr;
+  grid-template-columns: 8.5fr 1.5fr;
   grid-template-rows: 1fr;
   grid-column-gap: 0px;
   grid-row-gap: 0px;
@@ -372,6 +372,36 @@ body {
 #chat-btn-send:hover {
   background-color: var(--color-green);
   color: var(--color-black);
+}
+
+.chat-stream-msg-container {
+  padding: 0.5rem 0.5rem;
+  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}
+.chat-stream-msg-box {
+  flex: 0 1 auto;
+  display: flex;
+  flex-direction: row;
+}
+.chat-stream-msg-inner {
+  display: flex;
+}
+.chat-stream-msg-time {
+  margin: 0;
+  color: var(--color-gray);
+}
+.chat-stream-msg-name {
+  margin: 0;
+  color: var(--color-yellow);
+  padding-left: 0.5rem;
+}
+.chat-stream-msg-post {
+  margin: 0;
+  padding-left: 0.5rem;
 }
 
 .textbox {

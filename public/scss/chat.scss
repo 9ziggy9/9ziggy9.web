@@ -76,6 +76,33 @@
     }
 }
 
+.chat-stream-msg {
+    &-container {
+        @include padding_thin;
+        font-size: $FONT_SZ_TNY;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        margin: 0;
+    }
+    &-box {
+        flex: 0 1 auto;
+        display: flex;
+        flex-direction: row;
+    }
+    &-inner { display: flex; }
+    &-time {
+        margin: 0;
+        color: $CLR_GRAY;
+    };
+    &-name {
+        margin: 0;
+        color: $CLR_YEL;
+        padding-left: 0.5rem;
+    }
+    &-post { margin: 0; padding-left: 0.5rem; }
+}
+
 .textbox {
     @include color_pair($CLR_BLACK, $CLR_WHITE);
     @include padding_thin;
