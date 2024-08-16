@@ -22,6 +22,7 @@
     grid-area        : 1/1/2/2;
     background-color : $CLR_BLACK;
     overflow-y       : auto;
+    scrollbar-width  : thin;
     &-comm-container { @include min_fs; display: flex; }
     &-display        {
         @include grid_msg;
@@ -44,11 +45,21 @@
         @include chat_in_border($CLR_GREEN);
         @include color_pair($CLR_BLACK, $CLR_WHITE);
         display         : flex;
+        overflow-y      : scroll;
         justify-content : left;
+        flex-direction  : column;
         grid-area       : 1/2/2/3;
         box-sizing      : border-box;
         border-bottom   : none;
         font-size       : $FONT_SZ_TNY;
+        &-username {
+            padding        : 0;
+            display        : flex;
+            align-items    : center;
+            flex-direction : row;
+            span { padding-right: 0.5rem; color: $CLR_GREEN; }
+            p { padding: 0; }
+        }
     }
 }
 
@@ -127,7 +138,7 @@
     &-thumb {
       background-color : $CLR_GREEN;
       border-radius    : 1rem;
-      min-width        : 0.125rem;
+      min-width        : 0.05rem;
       &:hover { background-color: var(--color-blue); }
     }
 }

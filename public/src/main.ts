@@ -91,19 +91,16 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
               chatNameIn.addEventListener("keydown", e => {
                 if (e.key === "Enter") {
                   e.preventDefault();
+                  const oldName = ch.getUsername();
                   const res = ch.setUsername(chatNameIn.value);
                   if (!res.success) return console.error(res.error);
-                  console.log(ch.getUsername());
+                  const div = document.getElementById(
+                    `chat-stream-online-${oldName}`
+                  ) as HTMLElement;
+                  const nameArea = div.querySelector("p") as HTMLElement;
+                  nameArea.innerText = ch.getUsername();
+                  div.id = `chat-stream-online-${ch.getUsername()}`;
                   (chatUnameWin.toggle as Toggler)();
-
-                  const chstream
-                    = document.getElementById("chat-stream-msg-container");
-
-                  if (chstream) {
-                    chstream.appendChild(
-                      ch.genMessage("hello, now we have a message!")
-                    );
-                  }
                 }
               });
               ch.isInitialized.input = true;
@@ -133,8 +130,10 @@ function main(): void {
   attachWindows(mv, chSession);
   chat.INIT_MSG_INPUT(chSession);
 
-  viewMountHandler("view-chat-btn", "click",
-                   () => (mv.getWindow("chat").toggle as Toggler)());
+  viewMountHandler("view-chat-btn", "click", () => {
+    (mv.getWindow("chat").toggle as Toggler)();
+    chSession.goOnline();
+  });
 
 }
 

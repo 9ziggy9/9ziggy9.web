@@ -305,6 +305,7 @@ body {
   grid-area: 1/1/2/2;
   background-color: var(--color-black);
   overflow-y: auto;
+  scrollbar-width: thin;
 }
 .chat-stream-comm-container {
   min-width: 100%;
@@ -337,11 +338,26 @@ body {
   background-color: var(--color-black);
   color: var(--color-white);
   display: flex;
+  overflow-y: scroll;
   justify-content: left;
+  flex-direction: column;
   grid-area: 1/2/2/3;
   box-sizing: border-box;
   border-bottom: none;
   font-size: 1rem;
+}
+.chat-stream-online-username {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+.chat-stream-online-username span {
+  padding-right: 0.5rem;
+  color: var(--color-green);
+}
+.chat-stream-online-username p {
+  padding: 0;
 }
 
 .btn-stack {
@@ -438,7 +454,7 @@ body {
 ::-webkit-scrollbar-thumb {
   background-color: var(--color-green);
   border-radius: 1rem;
-  min-width: 0.125rem;
+  min-width: 0.05rem;
 }
 ::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-blue);

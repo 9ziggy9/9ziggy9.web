@@ -19,6 +19,11 @@ const MSG_TEMPLATE = (t: string, n: string, m: string) => `
   <p class="chat-stream-msg-post">${m}</p>
 `;
 
+const ONLINE_TEMPLATE = (n : string) => `
+  <span class="material-symbols-outlined">person</span>
+  <p>${n}</p>
+`;
+
 const GUARD_NAME_LENGTH = (name: string): Result<string> =>
   NAME_MIN_LENGTH > name.length || name.length > NAME_MAX_LENGTH
     ? { success: false, error: "invalid name length, must be (4-18) characters"}
@@ -50,13 +55,15 @@ export const INIT_MSG_INPUT = (s: Session) => {
 
 export interface Session {
   isInitialized : { input: boolean, stream: boolean },
+  goOnline      : () => void,
   getUsername   : () => string,
   setUsername   : (name: string) => Result<string>,
-  genMessage    : (m: string) => HTMLElement
+  genMessage    : (m: string) => HTMLElement,
 };
 
 export function startSession(): Session {
   let _username = "guest";
+  let _isOnline = false;
   return {
     isInitialized : { input: false, stream: false, },
     getUsername   : () => _username,
@@ -80,6 +87,17 @@ export function startSession(): Session {
       div.classList.add("chat-stream-msg-box");
       div.innerHTML = MSG_TEMPLATE(`${hrs}:${mins}`, _username, m);
       return div;
+    },
+    goOnline: () => {
+      if (!_isOnline) {
+        const div = document.createElement("div");
+        div.classList.add("chat-stream-online-username");
+        div.id = `chat-stream-online-${_username}`;
+        div.innerHTML = ONLINE_TEMPLATE(_username);
+        (document.getElementById("chat-stream-online") as HTMLElement)
+          .appendChild(div);
+        _isOnline = true;
+      }
     }
   }
 }
