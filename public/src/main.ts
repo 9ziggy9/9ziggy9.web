@@ -61,6 +61,28 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
   });
 
   mv.windowFrom({
+    id: "view-chat-popup",
+    template: "--templ-view-chat-popup",
+    name: "chat-popup",
+    header: "enter channel number",
+    bgColor: "var(--color-blue)",
+    exit: function() { if (this.toggle) this.toggle(); },
+    scales: {
+      default: { width: "30%",    height: "10%" },
+      max:     { width: "1280px", height: "1040px" }
+    },
+  });
+
+  mv.attachToggler({
+    winName: "chat-popup",
+    classId: "hidden",
+    transition: ["win-pop-view-in", "win-pop-view-out", 150],
+    onToggle: () => {
+      document.getElementById("chat-connect-in")?.focus();
+    }
+  });
+
+  mv.windowFrom({
     id: "view-chat",
     template: "--templ-view-chat",
     name: "chat",
@@ -80,7 +102,10 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
       {
         title: "run",
         actions: {
-          connect: () => console.log("connecting ..."),
+          connect: () => {
+            const chatChannelWin = mv.getWindow("chat-popup");
+            (chatChannelWin.toggle as Toggler)();
+          },
           name:    () => {
             const chatNameIn
               = common.getIdOrCry("chat-uname-in") as HTMLInputElement;
