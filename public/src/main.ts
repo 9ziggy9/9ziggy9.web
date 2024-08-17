@@ -155,6 +155,25 @@ function main(): void {
   attachWindows(mv, chSession);
   chat.INIT_MSG_INPUT(chSession);
 
+  const formData = new URLSearchParams();
+  formData.append("name", "ziggy");
+  formData.append("pwd",  "password123");
+
+  (async function() {
+    await fetch("http://localhost:9004/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: formData.toString(),
+      credentials: "include",
+    });
+    const res_users = await fetch("http://localhost:9004/users", {
+      credentials: "include",
+    });
+    const users = await res_users.json();
+    console.log(users);
+    // await fetch("http://localhost:9004/logout");
+  })();
+
   viewMountHandler("view-chat-btn", "click", () => {
     (mv.getWindow("chat").toggle as Toggler)();
     chSession.goOnline();
