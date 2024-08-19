@@ -1,15 +1,5 @@
 import "../css/style.css"
-
-const NAME_MIN_LENGTH    = 3;
-const NAME_MAX_LENGTH    = 18;
-const NAME_ALLOWED_CHARS =
-  "abcdefghijklmnopqrstuvwxyz1234567890-~!$%+=_*&#";
-
-interface Result<T> {
-  success : boolean;
-  data?   : T;
-  error?  : string;
-}
+import * as cmn from "./common";
 
 const MSG_TEMPLATE = (t: string, n: string, m: string) => `
   <div class="chat-stream-msg-inner">
@@ -23,18 +13,6 @@ const ONLINE_TEMPLATE = (n : string) => `
   <span class="material-symbols-outlined">person</span>
   <p>${n}</p>
 `;
-
-const GUARD_NAME_LENGTH = (name: string): Result<string> =>
-  NAME_MIN_LENGTH > name.length || name.length > NAME_MAX_LENGTH
-    ? { success: false, error: "invalid name length, must be (4-18) characters"}
-    : { success: true, data: name };
-
-const GUARD_NAME_CHARS = (name: string): Result<string> =>
-  name.toLowerCase()
-      .split("")
-      .reduce((b, c) => NAME_ALLOWED_CHARS.includes(c) && b, true)
-        ? { success: true, data: name }
-        : { success: false, error: "string contains invalid character"};
 
 export const INIT_MSG_INPUT = (s: Session) => {
   const input = document.getElementById("chat-input") as HTMLTextAreaElement;
@@ -57,7 +35,7 @@ export interface Session {
   isInitialized : { input: boolean, stream: boolean },
   goOnline      : () => void,
   getUsername   : () => string,
-  setUsername   : (name: string) => Result<string>,
+  setUsername   : (name: string) => cmn.Result<string>,
   genMessage    : (m: string) => HTMLElement,
 };
 
@@ -68,8 +46,8 @@ export function startSession(): Session {
     isInitialized : { input: false, stream: false, },
     getUsername   : () => _username,
     setUsername   : function(name: string) {
-      let res_len  = GUARD_NAME_LENGTH(name);
-      let res_name = GUARD_NAME_CHARS(name);
+      let res_len  = cmn.GUARD_NAME_LENGTH(name);
+      let res_name = cmn.GUARD_NAME_CHARS(name);
       if (!res_len.success || !res_name.success) return {
         success : false,
         error   :

@@ -586,4 +586,89 @@ body {
   color: var(--color-black);
 }
 
+#view-login {
+  display: inline-box;
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.view-login-outer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-black);
+  height: 100%;
+  width: 100%;
+}
+.view-login-inner {
+  width: 80%;
+}
+
+@keyframes legendFadeIn {
+  to {
+    opacity: 1;
+  }
+}
+fieldset {
+  color: var(--color-green);
+  text-align: center;
+  box-sizing: border-box;
+}
+fieldset legend {
+  box-sizing: border-box;
+  opacity: 0;
+  animation: legendFadeIn 0.5s ease-in forwards;
+}
+
+.login-btns {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.login-btns button {
+  background-color: var(--color-black);
+  color: var(--color-green);
+  font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 2rem;
+  font-style: normal;
+  font-size: 1rem;
+  border: 0.125rem solid var(--color-green);
+}
+.login-btns .login-btn-on {
+  background-color: var(--color-green);
+  color: var(--color-black);
+}
+
+#login-btn-register:hover, #login-btn-login:hover, #login-btn-submit:hover {
+  background-color: var(--color-blue);
+  color: var(--color-black);
+}
+
+#login-in {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  padding-left: 1rem;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--color-black);
+  color: var(--color-green);
+  font-family: "Pixelify Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-size: 2rem;
+  font-style: normal;
+  caret-shape: block;
+  font-size: 1.66rem;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+}
+
 /*# sourceMappingURL=style.css.map */

@@ -1,7 +1,8 @@
 import {RevealDir, MouseFlag} from "./common"
 import * as common from "./common"
 
-function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined | null {
+function _injectToolbar(spec: WinSpec, mv: MasterView)
+: HTMLElement | undefined | null {
   const WIN_TOOL_BAR_HTML = `
     <div class="winbar">
       <div class="winbar-left"></div>
@@ -17,9 +18,12 @@ function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined 
                   close_fullscreen
                 </span>
               </div>`: ""}
-        <span class="winbar-close material-symbols-outlined" id="winbar-close">
-          close
-        </span>
+      ${spec.exit
+        ? `<span class="winbar-close material-symbols-outlined"
+            id="winbar-close">
+            close
+          </span>`
+        : ""}
       </div>
     </div>
   `
@@ -73,18 +77,20 @@ function _injectToolbar(spec: WinSpec, mv: MasterView): HTMLElement | undefined 
         CONSTRUCT_UTILITY_MENU_BTNS(barLeft, um);
       });
     }
-    root
-      ?.querySelector("#winbar-close")
-      ?.addEventListener("click", () => {
-        if (spec.exit) spec.exit();
-        root.classList.remove("fullscreen");
-        root.style.maxWidth  = spec.scales?.max?.width      as string;
-        root.style.maxHeight = spec.scales?.max?.height     as string;
-        root.style.minWidth  = spec.scales?.min?.width      as string;
-        root.style.minHeight = spec.scales?.min?.height     as string;
-        root.style.width     = spec.scales?.default?.width  as string;
-        root.style.height    = spec.scales?.default?.height as string;
-      });
+    if (spec.exit) {
+      root
+        ?.querySelector("#winbar-close")
+        ?.addEventListener("click", () => {
+          if (spec.exit) spec.exit();
+          root.classList.remove("fullscreen");
+          root.style.maxWidth  = spec.scales?.max?.width      as string;
+          root.style.maxHeight = spec.scales?.max?.height     as string;
+          root.style.minWidth  = spec.scales?.min?.width      as string;
+          root.style.minHeight = spec.scales?.min?.height     as string;
+          root.style.width     = spec.scales?.default?.width  as string;
+          root.style.height    = spec.scales?.default?.height as string;
+        });
+    }
     if (spec.fullscreenable) {
       root
         ?.querySelector(".winbar-min-max")

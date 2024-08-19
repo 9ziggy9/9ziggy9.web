@@ -45,6 +45,7 @@
       <div id="view-chat"></div>
       <div id="view-chat-uname"></div>
       <div id="view-chat-popup"></div>
+      <div id="view-login"></div>
 
     </div>
 
@@ -109,4 +110,28 @@
     </div>
   </div>
 </template>
+
+<template id="--templ-auth">
+  <div class="view-login-outer">
+    <div class="view-login-inner">
+      <fieldset>
+        <legend id="input-legend">username</legend>
+        <input type="text"
+              spellcheck="false"
+              id="login-in"
+              name="login-in-name">
+      </fieldset>
+      <div id="login-btns" class="login-btns">
+        <div id="login-mode-btns">
+          <button id="login-btn-register">register</button>
+          <button id="login-btn-login" class="login-btn-on">login</button>
+        </div>
+        <div id="login-action-btns">
+          <button id="login-btn-submit">submit</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 </html>

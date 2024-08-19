@@ -4,6 +4,7 @@ import * as common from "./common"
 import * as themes from "./themes"
 import * as    win from "./window"
 import * as   chat from "./chat"
+import * as  login from "./login"
 
 function viewMountHandler(id: string, ev: string, fn: EventListener): void {
   const btn = common.getIdOrCry(id);
@@ -38,6 +39,26 @@ function loadThemes(): void {
 }
 
 function attachWindows(mv: MasterView, ch: chat.Session): void {
+  mv.windowFrom({
+    id: "view-login",
+    template: "--templ-auth",
+    name: "login",
+    header: "login or register",
+    scales: {
+      default: { width: "40%",    height: "30%" },
+      max:     { width: "1280px", height: "1040px" }
+    },
+  });
+
+  mv.attachToggler({
+    winName: "login",
+    classId: "hidden",
+    transition: ["win-pop-view-in", "win-pop-view-out", 150],
+    onToggle: () => {
+      document.getElementById("login-in")?.focus();
+    }
+  });
+
   mv.windowFrom({
     id: "view-chat-uname",
     template: "--templ-view-chat-uname",
@@ -155,24 +176,48 @@ function main(): void {
   attachWindows(mv, chSession);
   chat.INIT_MSG_INPUT(chSession);
 
-  const formData = new URLSearchParams();
-  formData.append("name", "ziggy");
-  formData.append("pwd",  "password123");
+  const SESSION: login.Session = { loggedIn: false };
 
-  (async function() {
-    await fetch("http://localhost:9004/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData.toString(),
-      credentials: "include",
-    });
-    const res_users = await fetch("http://localhost:9004/users", {
-      credentials: "include",
-    });
-    const users = await res_users.json();
-    console.log(users);
-    // await fetch("http://localhost:9004/logout");
-  })();
+  login.init(SESSION, {
+    currentMode:  "login",
+    currentField: "username",
+    inputLegend:  document.getElementById("input-legend") as HTMLLegendElement,
+    inputField:   document.getElementById("login-in")     as HTMLInputElement,
+    loginBtn:
+      document.getElementById("login-btn-login") as HTMLButtonElement,
+    registerBtn:
+      document.getElementById("login-btn-register") as HTMLButtonElement,
+  });
+
+  const login_view = mv.getWindow("login") as WindowView;
+  (login_view.toggle as Toggler)();
+
+  // const formData = new URLSearchParams();
+  // formData.append("name", "ziggy");
+  // formData.append("pwd",  "password123");
+
+  // (async function() {
+  //   await fetch("http://localhost:9004/login", {
+  //     method: "POST",
+  //     headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  //     body: formData.toString(),
+  //     credentials: "include",
+  //   });
+  //   const res_users = await fetch("http://localhost:9004/users", {
+  //     credentials: "include",
+  //   });
+  //   const users = await res_users.json();
+  //   console.log(users);
+  //   console.log("logging out");
+  //   await fetch("http://localhost:9004/logout", {
+  //     credentials: "include",
+  //   });
+  //   console.log("trying to fetch again");
+  //   await fetch("http://localhost:9004/users", {
+  //     credentials: "include",
+  //   });
+  // })();
+
 
   viewMountHandler("view-chat-btn", "click", () => {
     (mv.getWindow("chat").toggle as Toggler)();
