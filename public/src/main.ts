@@ -181,12 +181,29 @@ function main(): void {
   login.init(SESSION, {
     currentMode:  "login",
     currentField: "username",
+    root:         document.getElementById("view-login")   as HTMLElement,
     inputLegend:  document.getElementById("input-legend") as HTMLLegendElement,
     inputField:   document.getElementById("login-in")     as HTMLInputElement,
+    errorField:   document.getElementById("login-errors") as HTMLElement,
     loginBtn:
       document.getElementById("login-btn-login") as HTMLButtonElement,
     registerBtn:
       document.getElementById("login-btn-register") as HTMLButtonElement,
+    onSubmit: async function(name: string, pwd: string) {
+      const to_server = new URLSearchParams();
+      to_server.append("name", name);
+      to_server.append("pwd", pwd);
+      const endpoint = "http://localhost:9004/"
+        + (this.currentMode === "login" ? "login" : "register");
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: to_server.toString(),
+        credentials: "include",
+      });
+      if (!res.ok) return {"err": "failure"};
+      return res.json();
+    }
   });
 
   const login_view = mv.getWindow("login") as WindowView;

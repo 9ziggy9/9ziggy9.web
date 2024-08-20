@@ -6,11 +6,13 @@ type LoginModeType  = "login" | "register";
 export interface LoginInterface {
   currentMode:  LoginModeType;
   currentField: LoginFieldType;
+  root:         HTMLElement;
   inputLegend:  HTMLLegendElement;
   inputField:   HTMLInputElement;
+  errorField:   HTMLElement;
   loginBtn:     HTMLButtonElement;
   registerBtn:  HTMLButtonElement;
-  onSubmit:     () => Promise<Record<string, unknown>>;
+  onSubmit:     (n: string, p: string) => Promise<Record<string, unknown>>;
 }
 
 export interface Session {
@@ -34,6 +36,13 @@ const _toggler = (t: LoginModeType, IT: LoginInterface) => () => {
   };
 }
 
+function _setField(f: LoginFieldType, IT: LoginInterface) {
+  IT.currentField = f;
+  IT.inputLegend.innerText = f;
+  IT.inputField.value = "";
+  IT.inputField.type = f === "password" ? f : "";
+}
+
 export function init(S: Session, IT: LoginInterface): void {
   let _p1: string | null = null;
   let _p2: string | null = null;
@@ -47,14 +56,22 @@ export function init(S: Session, IT: LoginInterface): void {
         switch (IT.currentField) {
           case "username":
             S.username = IT.inputField.value;
-            IT.currentField = "password";
-            IT.inputLegend.innerText = IT.currentField;
-            IT.inputField.value = "";
-            IT.inputField.type = "password";
+            _setField("password", IT);
+            IT.errorField.innerText = "";
             break;
           case "password":
             _p1 = IT.inputField.value;
-            console.log(_p1);
+            if (S.username) {
+              IT.onSubmit(S.username, _p1)
+                .then(res => {
+                  if (res.err) {
+                    IT.errorField.innerText = "login failure, try again";
+                    _setField("username", IT);
+                  } else {
+                    IT.root.classList.add("hidden");
+                  }
+                })
+            }
             _p1 = null;
             break;
         }
@@ -76,9 +93,9 @@ export function init(S: Session, IT: LoginInterface): void {
           case "confirm password":
             _p2 = IT.inputField.value;
             IT.inputField.value = "";
-            console.log(_p1, _p2, _p1 === _p2);
-            _p1 = null;
-            _p2 = null;
+            if (_p1 !== _p2) throw new Error("passwords do not match");
+            if (S.username) IT.onSubmit(S.username, _p1);
+            _p1 = null; _p2 = null;
             break;
         }
       }

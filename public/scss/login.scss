@@ -12,30 +12,20 @@
 .view-login {
   &-outer {
       @include flex_center;
+      flex-direction: column;
       background-color: $CLR_BLACK;
       height: 100%;
       width: 100%;
   }
-  &-inner {
-      width: 80%;
-  }
-}
-
-@keyframes legendFadeIn {
-    to {
-        opacity: 1;
-    }
+  &-inner { width: 80%; }
+  &-errors { color: $CLR_RED; font-size: $FONT_SZ_MIN; }
 }
 
 fieldset {
     color: $CLR_GREEN;
     text-align: center;
     box-sizing: border-box;
-    legend {
-        box-sizing: border-box;
-        opacity: 0;
-        animation: legendFadeIn 0.5s ease-in forwards;
-    }
+    legend { box-sizing: border-box; }
 }
 
 .login-btns {

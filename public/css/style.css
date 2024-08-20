@@ -599,6 +599,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
   background-color: var(--color-black);
   height: 100%;
   width: 100%;
@@ -606,12 +607,11 @@ body {
 .view-login-inner {
   width: 80%;
 }
-
-@keyframes legendFadeIn {
-  to {
-    opacity: 1;
-  }
+.view-login-errors {
+  color: var(--color-red);
+  font-size: 1.5rem;
 }
+
 fieldset {
   color: var(--color-green);
   text-align: center;
@@ -619,8 +619,6 @@ fieldset {
 }
 fieldset legend {
   box-sizing: border-box;
-  opacity: 0;
-  animation: legendFadeIn 0.5s ease-in forwards;
 }
 
 .login-btns {
