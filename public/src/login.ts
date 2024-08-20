@@ -99,6 +99,7 @@ export function init(S: Session, IT: LoginInterface): void {
             _setField("username", IT);
           } else {
             if (S.username) {
+              console.table(S);
               IT.onSubmit(S.username, _p1, true)
                 .then(res => {
                   if (res.err) {

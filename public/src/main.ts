@@ -179,48 +179,60 @@ function main(): void {
 
   const SESSION: login.Session = { loggedIn: false };
 
-  login.init(SESSION, {
-    currentMode:  "login",
-    currentField: "username",
-    root:         document.getElementById("view-login")   as HTMLElement,
-    inputLegend:  document.getElementById("input-legend") as HTMLLegendElement,
-    inputField:   document.getElementById("login-in")     as HTMLInputElement,
-    errorField:   document.getElementById("login-errors") as HTMLElement,
-    loginBtn:
-      document.getElementById("login-btn-login") as HTMLButtonElement,
-    registerBtn:
-      document.getElementById("login-btn-register") as HTMLButtonElement,
-    onSubmit: async function(name: string, pwd: string, reg: boolean) {
-      const to_server = new URLSearchParams();
-      to_server.append("name", name);
-      to_server.append("pwd", pwd);
-      if (reg) to_server.append("reg", reg.toString());
-      const endpoint = "http://localhost:9004/"
-        + (this.currentMode === "login" ? "login" : "register");
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: to_server.toString(),
-        credentials: "include",
-      });
-      if (!res.ok)  {
-        switch (res.status) {
-          case 401: case 402:
-            if (this.currentMode === "login") return {"err": "login failure"};
-            return {"err": "user already exists"};
-          case 500:
-            if (this.currentMode === "login") return {"err": "login failure"};
-            return {"err": "failed to register user"};
-          default:
-            return { "err": `Unexpected error: ${res.status}` };
-        }
-      }
-      return res.json();
+  (async () => {
+    const res = await fetch("http://localhost:9004/status", {
+      method: "GET",
+      credentials: "include",
+    });
+    if (res.ok) {
+      const user_data  = await res.json();
+      SESSION.username = user_data.name;
+      SESSION.loggedIn = true;
+      SESSION.userId   = user_data.id;
+      console.log(SESSION);
     }
-  });
-
-  const login_view = mv.getWindow("login") as WindowView;
-  (login_view.toggle as Toggler)();
+    login.init(SESSION, {
+      currentMode:  "login",
+      currentField: "username",
+      root:         document.getElementById("view-login")   as HTMLElement,
+      inputLegend:  document.getElementById("input-legend") as HTMLLegendElement,
+      inputField:   document.getElementById("login-in")     as HTMLInputElement,
+      errorField:   document.getElementById("login-errors") as HTMLElement,
+      loginBtn:
+        document.getElementById("login-btn-login") as HTMLButtonElement,
+      registerBtn:
+        document.getElementById("login-btn-register") as HTMLButtonElement,
+      onSubmit: async function(name: string, pwd: string, reg: boolean) {
+        const to_server = new URLSearchParams();
+        to_server.append("name", name);
+        to_server.append("pwd", pwd);
+        if (reg) to_server.append("reg", reg.toString());
+        const endpoint = "http://localhost:9004/"
+          + (this.currentMode === "login" ? "login" : "register");
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: to_server.toString(),
+          credentials: "include",
+        });
+        if (!res.ok)  {
+          switch (res.status) {
+            case 401: case 402:
+              if (this.currentMode === "login") return {"err": "login failure"};
+              return {"err": "user already exists"};
+            case 500:
+              if (this.currentMode === "login") return {"err": "login failure"};
+              return {"err": "failed to register user"};
+            default:
+              return { "err": `Unexpected error: ${res.status}` };
+          }
+        }
+        return res.json();
+      }
+    });
+    const login_view = mv.getWindow("login") as WindowView;
+    if (!SESSION.loggedIn) (login_view.toggle as Toggler)();
+  })();
 
   viewMountHandler("view-chat-btn", "click", () => {
     if (SESSION.loggedIn) {
