@@ -14,7 +14,8 @@ function viewMountHandler(id: string, ev: string, fn: EventListener): void {
 
 function loadThemes(): void {
   const themeControl = themes.bootstrap();
-  themeControl.select("NINEZIG");
+  const savedTheme = themeControl.getSavedTheme();
+  themeControl.select(savedTheme ? savedTheme : "NINEZIG");
   const btn = common.getIdOrDie("color-theme-btn");
   if (btn) {
     const menu = document.createElement("div");

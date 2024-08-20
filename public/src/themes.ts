@@ -20,11 +20,16 @@ export function bootstrap(): ThemeController {
       styleContainer.innerHTML = theme.css;
       Object.entries(this.lib).forEach(([_, pair]) => pair.active = false);
       theme.active = true;
+      document.cookie = `theme=${name};path=/`;
     },
     cycleCurrent: (curr: HTMLElement) =>  {
       if (_curr) _curr.classList.remove("color-theme-btn-on");
       curr.classList.add("color-theme-btn-on");
       _curr = curr;
+    },
+    getSavedTheme: () => {
+      const match = document.cookie.match(new RegExp('(^| )theme=([^;]+)'));
+      return match ? match[2] : null;     
     }
   };
 }

@@ -11,6 +11,7 @@ interface ThemeController {
   lib: ThemeLibrary;
   select:       (string) => void;
   cycleCurrent: (HTMLElement) => void;
+  getSavedTheme: () => string | null;
 }
 
 interface UtilityMenu { title: string; actions: UtilityActions; }
