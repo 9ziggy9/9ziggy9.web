@@ -189,10 +189,11 @@ function main(): void {
       document.getElementById("login-btn-login") as HTMLButtonElement,
     registerBtn:
       document.getElementById("login-btn-register") as HTMLButtonElement,
-    onSubmit: async function(name: string, pwd: string) {
+    onSubmit: async function(name: string, pwd: string, reg: boolean) {
       const to_server = new URLSearchParams();
       to_server.append("name", name);
       to_server.append("pwd", pwd);
+      if (reg) to_server.append("reg", reg.toString());
       const endpoint = "http://localhost:9004/"
         + (this.currentMode === "login" ? "login" : "register");
       const res = await fetch(endpoint, {
@@ -201,7 +202,18 @@ function main(): void {
         body: to_server.toString(),
         credentials: "include",
       });
-      if (!res.ok) return {"err": "failure"};
+      if (!res.ok)  {
+        switch (res.status) {
+          case 401: case 402:
+            if (this.currentMode === "login") return {"err": "login failure"};
+            return {"err": "user already exists"};
+          case 500:
+            if (this.currentMode === "login") return {"err": "login failure"};
+            return {"err": "failed to register user"};
+          default:
+            return { "err": `Unexpected error: ${res.status}` };
+        }
+      }
       return res.json();
     }
   });
@@ -209,36 +221,11 @@ function main(): void {
   const login_view = mv.getWindow("login") as WindowView;
   (login_view.toggle as Toggler)();
 
-  // const formData = new URLSearchParams();
-  // formData.append("name", "ziggy");
-  // formData.append("pwd",  "password123");
-
-  // (async function() {
-  //   await fetch("http://localhost:9004/login", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/x-www-form-urlencoded" },
-  //     body: formData.toString(),
-  //     credentials: "include",
-  //   });
-  //   const res_users = await fetch("http://localhost:9004/users", {
-  //     credentials: "include",
-  //   });
-  //   const users = await res_users.json();
-  //   console.log(users);
-  //   console.log("logging out");
-  //   await fetch("http://localhost:9004/logout", {
-  //     credentials: "include",
-  //   });
-  //   console.log("trying to fetch again");
-  //   await fetch("http://localhost:9004/users", {
-  //     credentials: "include",
-  //   });
-  // })();
-
-
   viewMountHandler("view-chat-btn", "click", () => {
-    (mv.getWindow("chat").toggle as Toggler)();
-    chSession.goOnline();
+    if (SESSION.loggedIn) {
+      (mv.getWindow("chat").toggle as Toggler)();
+      chSession.goOnline();
+    }
   });
 
 }

@@ -12,7 +12,8 @@ export interface LoginInterface {
   errorField:   HTMLElement;
   loginBtn:     HTMLButtonElement;
   registerBtn:  HTMLButtonElement;
-  onSubmit:     (n: string, p: string) => Promise<Record<string, unknown>>;
+  onSubmit:
+  (n: string, p: string, b: boolean) => Promise<Record<string, unknown>>;
 }
 
 export interface Session {
@@ -40,7 +41,8 @@ function _setField(f: LoginFieldType, IT: LoginInterface) {
   IT.currentField = f;
   IT.inputLegend.innerText = f;
   IT.inputField.value = "";
-  IT.inputField.type = f === "password" ? f : "";
+  IT.inputField.type
+    = (f === "password" || f === "confirm password") ? "password" : "";
 }
 
 export function init(S: Session, IT: LoginInterface): void {
@@ -62,13 +64,14 @@ export function init(S: Session, IT: LoginInterface): void {
           case "password":
             _p1 = IT.inputField.value;
             if (S.username) {
-              IT.onSubmit(S.username, _p1)
+              IT.onSubmit(S.username, _p1, false)
                 .then(res => {
                   if (res.err) {
                     IT.errorField.innerText = "login failure, try again";
                     _setField("username", IT);
                   } else {
                     IT.root.classList.add("hidden");
+                    S.loggedIn = true;
                   }
                 })
             }
@@ -77,26 +80,38 @@ export function init(S: Session, IT: LoginInterface): void {
         }
       } else if (IT.currentMode === "register") {
         switch (IT.currentField) {
-          case "username":
-            S.username = IT.inputField.value;
-            IT.currentField = "password";
-            IT.inputLegend.innerText = IT.currentField;
-            IT.inputField.value = "";
-            IT.inputField.type = "password";
-            break;
-          case "password":
-            IT.currentField = "confirm password";
-            _p1 = IT.inputField.value;
-            IT.inputLegend.innerText = IT.currentField;
-            IT.inputField.value = "";
-            break;
-          case "confirm password":
-            _p2 = IT.inputField.value;
-            IT.inputField.value = "";
-            if (_p1 !== _p2) throw new Error("passwords do not match");
-            if (S.username) IT.onSubmit(S.username, _p1);
-            _p1 = null; _p2 = null;
-            break;
+        case "username":
+          S.username = IT.inputField.value;
+          _setField("password", IT);
+          IT.errorField.innerText = "";
+          break;
+        case "password":
+          IT.currentField = "confirm password";
+          _p1 = IT.inputField.value;
+          _setField("confirm password", IT);
+          IT.errorField.innerText = "";
+          break;
+        case "confirm password":
+          _p2 = IT.inputField.value;
+          IT.inputField.value = "";
+          if (_p1 !== _p2) {
+            IT.errorField.innerText = "mismatched passwords, try again"
+            _setField("username", IT);
+          } else {
+            if (S.username) {
+              IT.onSubmit(S.username, _p1, true)
+                .then(res => {
+                  if (res.err) {
+                    IT.errorField.innerText = res.err+", try again";
+                    _setField("username", IT);
+                  } else {
+                    IT.root.classList.add("hidden");
+                    S.loggedIn = true;
+                  }
+                });
+            }
+          }
+          break;
         }
       }
     }

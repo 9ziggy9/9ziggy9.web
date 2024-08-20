@@ -45,10 +45,10 @@ interface WindowView {
 }
 
 interface TogglerSpec {
-  winName:        string,
-  classId:        string,
-  transition?:    [string, string, number],
-  onToggle?:      (w: WindowView) => void,
+  winName     : string,
+  classId     : string,
+  transition? : [string, string, number],
+  onToggle?   : (w: WindowView) => void,
 }
 
 type Toggler = () => void;
