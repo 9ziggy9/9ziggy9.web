@@ -169,6 +169,9 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
         stream.appendChild(
           ch.genMessage("Welcome! Please connect to a channel to chat!", true)
         );
+        ch.attachMsgHandle((msg: string) => {
+          stream.appendChild(ch.genMessage(msg));
+        });
       }
       if (vw.root.classList.contains("fullscreen")) mv.resetSizes(vw);
     },

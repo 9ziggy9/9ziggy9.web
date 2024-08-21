@@ -22,10 +22,10 @@ export const INIT_MSG_INPUT = (s: Session) => {
   input.addEventListener("keydown", e => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      stream.appendChild(s.genMessage(input.value));
       const skt = s.getConnection();
       if (skt) {
         skt.send(input.value);
+        stream.appendChild(s.genMessage(input.value));
       }
       input.value = "";
     }
@@ -36,15 +36,17 @@ export const INIT_MSG_INPUT = (s: Session) => {
 }
 
 export interface Session {
-  isInitialized : { input: boolean, stream: boolean, channels: boolean },
-  goOnline      : () => void,
-  getUsername   : () => string,
-  setUsername   : (name: string) => cmn.Result<string>,
-  getChannel    : () => number | null,
-  setChannel    : (n: number) => number | null,
-  genMessage    : (m: string, i?: boolean) => HTMLElement,
-  connect       : () => void,
-  getConnection : () => WebSocket | null,
+  isInitialized   : { input: boolean, stream: boolean, channels: boolean },
+  goOnline        : () => void,
+  getUsername     : () => string,
+  setUsername     : (name: string) => cmn.Result<string>,
+  getChannel      : () => number | null,
+  setChannel      : (n: number) => number | null,
+  genMessage      : (m: string, i?: boolean) => HTMLElement,
+  connect         : () => void,
+  disconnect      : () => void,
+  getConnection   : () => WebSocket | null,
+  attachMsgHandle : (fn: (msg: string) => void) => void,
 };
 
 export function startSession(): Session {
@@ -52,6 +54,7 @@ export function startSession(): Session {
   let _isOnline                 = false;
   let _channel: number | null   = null;
   let _socket: WebSocket | null = null;
+  let _msgHandler: ((...args: any) => void) | null = null;
   return {
     isInitialized : { input: false, stream: false, channels: false, },
     getChannel    : () => _channel,
@@ -91,8 +94,16 @@ export function startSession(): Session {
         _isOnline = true;
       }
     },
+    attachMsgHandle: (fn) => _msgHandler = fn,
     connect:
-      () => _socket = new WebSocket(`ws://localhost:9003/${_channel}`),
+    () => {
+      _socket = new WebSocket(`ws://localhost:9003/${_channel}`);
+      _socket.onmessage = ({data}) => {
+        console.log("received message");
+        if (_msgHandler) _msgHandler(data);
+      };
+    },
+    disconnect:    () => { if (_socket) _socket.close(); },
     getConnection: () => _socket,
   }
 }
