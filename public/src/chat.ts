@@ -32,18 +32,23 @@ export const INIT_MSG_INPUT = (s: Session) => {
 }
 
 export interface Session {
-  isInitialized : { input: boolean, stream: boolean },
+  isInitialized : { input: boolean, stream: boolean, channels: boolean },
   goOnline      : () => void,
   getUsername   : () => string,
   setUsername   : (name: string) => cmn.Result<string>,
-  genMessage    : (m: string) => HTMLElement,
+  getChannel    : () => number | null,
+  setChannel    : (n: number) => number | null,
+  genMessage    : (m: string, i?: boolean) => HTMLElement,
 };
 
 export function startSession(): Session {
-  let _username = "guest";
-  let _isOnline = false;
+  let _username               = "guest";
+  let _isOnline               = false;
+  let _channel: number | null = null;
   return {
-    isInitialized : { input: false, stream: false, },
+    isInitialized : { input: false, stream: false, channels: false, },
+    getChannel    : () => _channel,
+    setChannel    : (n: number) => { _channel = n; return _channel; },
     getUsername   : () => _username,
     setUsername   : function(name: string) {
       let res_len  = cmn.GUARD_NAME_LENGTH(name);
@@ -57,13 +62,15 @@ export function startSession(): Session {
       _username = name;
       return { success: true, data: _username };
     },
-    genMessage: (m: string) =>  {
+    genMessage: (m: string, info?: boolean) =>  {
       const now  = new Date();
       const hrs  = now.getHours().toString().padStart(2, '0');
       const mins = now.getMinutes().toString().padStart(2, '0');
       const div  = document.createElement("div");
       div.classList.add("chat-stream-msg-box");
-      div.innerHTML = MSG_TEMPLATE(`${hrs}:${mins}`, _username, m);
+      div.innerHTML = MSG_TEMPLATE(
+        `${hrs}:${mins}`, info ? "[ INFO ]" : _username, m
+      );
       return div;
     },
     goOnline: () => {

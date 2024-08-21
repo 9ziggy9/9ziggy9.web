@@ -39,10 +39,11 @@ interface WinSpec {
 }
 
 interface WindowView {
-  id      : string;
-  root    : HTMLElement;
-  spec    : WinSpec;
-  toggle? : Toggler;
+  id           : string;
+  root         : HTMLElement;
+  spec         : WinSpec;
+  updateHeader : (s: string) => void;
+  toggle?      : Toggler;
 }
 
 interface TogglerSpec {

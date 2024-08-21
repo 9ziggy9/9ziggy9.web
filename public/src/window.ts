@@ -6,7 +6,7 @@ function _injectToolbar(spec: WinSpec, mv: MasterView)
   const WIN_TOOL_BAR_HTML = `
     <div class="winbar">
       <div class="winbar-left"></div>
-      ${spec.header ? `<div>${spec.header}</div>`: ""}
+      ${spec.header ? `<div class="header-area">${spec.header}</div>`: ""}
       <div class="winbar-right">
       ${spec.fullscreenable ?
             `<div class="winbar-min-max">
@@ -123,9 +123,15 @@ function _wrapWin(spec: WinSpec, mv: MasterView): WindowView | null {
   }
   root?.classList.add("hidden", "view-win");
   if (spec.bgColor) root.style.borderColor = spec.bgColor;
-  const vw = { id: spec.id, root, spec };
+  const vw = {
+    id: spec.id, root, spec,
+    updateHeader: (s: string) => {
+      const hd = root.querySelector<HTMLElement>(".header-area");
+      if (hd) hd.innerText = s;
+    }
+  };
   _resetSizes(vw);
-  return vw
+  return vw;
 }
 
 async function _classSwitch(

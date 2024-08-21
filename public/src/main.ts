@@ -26,7 +26,7 @@ function loadThemes(): void {
         themeControl.select(theme);
         themeControl.cycleCurrent(curr);
       });
-      if (theme == "NINEZIG") themeControl.cycleCurrent(curr);
+      if (theme == savedTheme) themeControl.cycleCurrent(curr);
     }
     btn.addEventListener("click", () => {
       common.revealMenu(btn, menu, common.RevealDir.UP);
@@ -127,33 +127,21 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
           connect: () => {
             const chatChannelWin = mv.getWindow("chat-popup");
             (chatChannelWin.toggle as Toggler)();
-          },
-          name:    () => {
-            const chatNameIn
-              = common.getIdOrCry("chat-uname-in") as HTMLInputElement;
-            const chatUnameWin = mv.getWindow("chat-uname");
-            if (!ch.isInitialized.input) {
-              console.log("initializing chat input ... ");
-              if (!chatNameIn) throw Error("couldn't get chat input");
-              chatNameIn.addEventListener("keydown", e => {
+            if (!ch.isInitialized.channels) {
+              const connIn =
+                document.getElementById("chat-connect-in") as HTMLInputElement;
+              connIn.addEventListener("keydown", e => {
                 if (e.key === "Enter") {
-                  e.preventDefault();
-                  const oldName = ch.getUsername();
-                  const res = ch.setUsername(chatNameIn.value);
-                  if (!res.success) return console.error(res.error);
-                  const div = document.getElementById(
-                    `chat-stream-online-${oldName}`
-                  ) as HTMLElement;
-                  const nameArea = div.querySelector("p") as HTMLElement;
-                  nameArea.innerText = ch.getUsername();
-                  div.id = `chat-stream-online-${ch.getUsername()}`;
-                  (chatUnameWin.toggle as Toggler)();
+                  // need to add validations
+                  ch.setChannel(Number(connIn.value));
+                  mv.getWindow("chat").updateHeader(
+                    `chat [channel: ${ch.getChannel()}]`
+                  );
+                  (chatChannelWin.toggle as Toggler)();
                 }
               });
-              ch.isInitialized.input = true;
             }
-            (chatUnameWin.toggle as Toggler)();
-          }
+          },
         }
       },
     ]
@@ -164,6 +152,14 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
     classId:  "hidden",
     transition: ["win-pop-view-in", "win-pop-view-out", 150],
     onToggle: (vw) => {
+      if (ch.getChannel() === null) {
+        const stream
+          = document.getElementById("chat-stream-msg-container") as HTMLElement;
+        stream.innerHTML = "";
+        stream.appendChild(
+          ch.genMessage("Welcome! Please connect to a channel to chat!", true)
+        );
+      }
       if (vw.root.classList.contains("fullscreen")) mv.resetSizes(vw);
     },
   });
@@ -237,6 +233,7 @@ function main(): void {
   viewMountHandler("view-chat-btn", "click", () => {
     if (SESSION.loggedIn) {
       (mv.getWindow("chat").toggle as Toggler)();
+      if (SESSION.username) chSession.setUsername(SESSION.username);
       chSession.goOnline();
     }
   });

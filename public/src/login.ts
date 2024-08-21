@@ -1,4 +1,5 @@
-import "../css/style.css"
+import "../css/style.css";
+import * as cmn from "./common";
 
 type LoginFieldType = "username" | "password" | "confirm password";
 type LoginModeType  = "login" | "register";
@@ -74,6 +75,9 @@ export function init(S: Session, IT: LoginInterface): void {
                     S.loggedIn = true;
                   }
                 })
+            } else {
+              IT.errorField.innerText = "empty username field, try again";
+              _setField("username", IT);
             }
             _p1 = null;
             break;
@@ -97,19 +101,38 @@ export function init(S: Session, IT: LoginInterface): void {
           if (_p1 !== _p2) {
             IT.errorField.innerText = "mismatched passwords, try again"
             _setField("username", IT);
+            break;
           } else {
+            if (!S.username) {
+              IT.errorField.innerText = "username cannot be empty";
+              _setField("username", IT);
+              break;
+            }
             if (S.username) {
-              console.table(S);
-              IT.onSubmit(S.username, _p1, true)
-                .then(res => {
-                  if (res.err) {
-                    IT.errorField.innerText = res.err+", try again";
-                    _setField("username", IT);
-                  } else {
-                    IT.root.classList.add("hidden");
-                    S.loggedIn = true;
-                  }
-                });
+              const glen_uname   = cmn.GUARD_NAME_LENGTH(S.username);
+              const gchars_uname = cmn.GUARD_NAME_LENGTH(S.username);
+              if (!glen_uname.success && glen_uname.error) {
+                IT.errorField.innerText = glen_uname.error;
+                _setField("username", IT);
+                break;
+              }
+              else if (!gchars_uname.success && gchars_uname.error) {
+                IT.errorField.innerText = gchars_uname.error;
+                _setField("username", IT);
+                break;
+              }
+              else {
+                IT.onSubmit(S.username, _p1, true)
+                  .then(res => {
+                    if (res.err) {
+                      IT.errorField.innerText = res.err+", try again";
+                      _setField("username", IT);
+                    } else {
+                      IT.root.classList.add("hidden");
+                      S.loggedIn = true;
+                    }
+                  });
+              }
             }
           }
           break;
