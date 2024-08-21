@@ -3,18 +3,39 @@ import * as cmn from "./common";
 
 export enum ChSig { MESG, INFO, JOIN, EXIT };
 
-const MSG_TEMPLATE = (t: string, n: string, m: string) => `
-  <div class="chat-stream-msg-inner">
-    <p class="chat-stream-msg-time">${t}</p>
-    <p class="chat-stream-msg-name">${n}</p>
-  </div>
-  <p class="chat-stream-msg-post">${m}</p>
-`;
+type MsgTemplate = {
+  sig   : ChSig,
+  time? : string,
+  name? : string,
+  msg?  : string,
+}
 
-const ONLINE_TEMPLATE = (n : string) => `
-  <span class="material-symbols-outlined">person</span>
-  <p>${n}</p>
-`;
+const MSG_FROM = (t: MsgTemplate): string => {
+  switch (t.sig) {
+    case ChSig.JOIN:
+      return `
+        <span class="material-symbols-outlined">person</span>
+        <p>${t.name}</p>
+      `;
+    case ChSig.INFO:
+      return `
+        <div class="chat-stream-msg-inner">
+          <p class="chat-stream-msg-time">${t.time}</p>
+        </div>
+        <p class="chat-stream-msg-post" style="color:var(--color-blue)">
+          ${t.msg}
+        </p>
+      `;
+    case ChSig.MESG: default:
+      return `
+        <div class="chat-stream-msg-inner">
+          <p class="chat-stream-msg-time">${t.time}</p>
+          <p class="chat-stream-msg-name">${t.name}</p>
+        </div>
+        <p class="chat-stream-msg-post">${t.msg}</p>
+      `;
+  }
+}
 
 export const INIT_MSG_INPUT = (s: Session) => {
   const input = document.getElementById("chat-input") as HTMLTextAreaElement;
@@ -28,7 +49,9 @@ export const INIT_MSG_INPUT = (s: Session) => {
       if (skt) {
         /* Very simple encoding, just a ';' delimiter */
         skt.send(`${ChSig.MESG};${s.getUsername()};${input.value}`);
-        stream.appendChild(s.genMessage(input.value, s.getUsername()));
+        stream.appendChild(
+          s.genMessage(ChSig.MESG, input.value, s.getUsername())
+        );
       }
       input.value = "";
     }
@@ -49,7 +72,7 @@ export interface Session {
   getUsername      : () => string,
   setUsername      : (name: string) => cmn.Result<string>,
   getChannel       : () => number | null,
-  genMessage       : (m: string, s?: string) => HTMLElement,
+  genMessage       : (s: ChSig, m: string, n?: string) => HTMLElement,
   connect          : (chan: number) => Promise<WebSocket | null>,
   disconnect       : () => void,
   getConnection    : () => WebSocket | null,
@@ -83,15 +106,25 @@ export function startSession(): Session {
       _username = name;
       return { success: true, data: _username };
     },
-    genMessage: (msg: string, sender?: string) =>  {
+    genMessage: (sig: ChSig, msg: string, sender?: string) =>  {
       const now  = new Date();
       const hrs  = now.getHours().toString().padStart(2, '0');
       const mins = now.getMinutes().toString().padStart(2, '0');
       const div  = document.createElement("div");
       div.classList.add("chat-stream-msg-box");
-      div.innerHTML = MSG_TEMPLATE(
-        `${hrs}:${mins}`, sender ? sender : "", msg
-      );
+      div.innerHTML = MSG_FROM(
+        sig === ChSig.MESG
+          ? {
+            sig: sig,
+            time: `${hrs}:${mins}`,
+            name: sender,
+            msg: msg
+          }
+          : {
+            sig: sig,
+            time: `${hrs}:${mins}`,
+            msg: msg
+          })
       return div;
     },
     goOnline: () => {
@@ -99,7 +132,10 @@ export function startSession(): Session {
         const div = document.createElement("div");
         div.classList.add("chat-stream-online-username");
         div.id = `chat-stream-online-${_username}`;
-        div.innerHTML = ONLINE_TEMPLATE(_username);
+        div.innerHTML = MSG_FROM({
+          sig: ChSig.JOIN,
+          name: _username
+        });
         (document.getElementById("chat-stream-online") as HTMLElement)
           .appendChild(div);
         _isOnline = true;

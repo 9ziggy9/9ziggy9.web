@@ -126,7 +126,9 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
                   .getElementById("chat-stream-msg-container") as HTMLElement;
                 stream.innerHTML = "";
                 stream.appendChild(
-                  ch.genMessage(`connected to channel ${ch.getChannel()}`)
+                  ch.genMessage(
+                    ChSig.INFO, `connected to channel ${ch.getChannel()}`
+                  )
                 );
                 ws.send(chat.encode(ChSig.JOIN, ch.getUsername()));
               }
@@ -172,16 +174,20 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
           = document.getElementById("chat-stream-msg-container") as HTMLElement;
         stream.innerHTML = "";
         stream.appendChild(
-          ch.genMessage("Welcome! Please connect to a channel to chat!")
+          ch.genMessage(
+            ChSig.INFO, "Welcome! Please connect to a channel to chat!"
+          )
         );
         ch.attachHandler(ChSig.MESG, (msg: string) => {
             const [_, sender_name, sender_msg] = msg.split(";");
-            stream.appendChild(ch.genMessage(sender_msg, sender_name));
+            stream.appendChild(
+              ch.genMessage(ChSig.MESG, sender_msg, sender_name)
+            );
           })
           .attachHandler(ChSig.JOIN, (msg: string) => {
             const [_, sender_name] = msg.split(";");
             stream.appendChild(
-              ch.genMessage(`${sender_name} joined channel.`)
+              ch.genMessage(ChSig.INFO, `${sender_name} joined channel.`)
             );
           })
           .attachHandler(ChSig.INFO, (msg: string) => {
