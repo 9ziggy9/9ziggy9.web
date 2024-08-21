@@ -128,16 +128,26 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
             const chatChannelWin = mv.getWindow("chat-popup");
             (chatChannelWin.toggle as Toggler)();
             if (!ch.isInitialized.channels) {
+              ch.isInitialized.channels = true;
               const connIn =
                 document.getElementById("chat-connect-in") as HTMLInputElement;
               connIn.addEventListener("keydown", e => {
                 if (e.key === "Enter") {
                   // need to add validations
                   ch.setChannel(Number(connIn.value));
+                  ch.connect();
                   mv.getWindow("chat").updateHeader(
                     `chat [channel: ${ch.getChannel()}]`
                   );
                   (chatChannelWin.toggle as Toggler)();
+                  const stream = document
+                    .getElementById("chat-stream-msg-container") as HTMLElement;
+                  stream.innerHTML = "";
+                  stream.appendChild(
+                    ch.genMessage(
+                      `connected to channel ${ch.getChannel()}`, true
+                    )
+                  );
                 }
               });
             }

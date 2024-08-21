@@ -23,6 +23,10 @@ export const INIT_MSG_INPUT = (s: Session) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       stream.appendChild(s.genMessage(input.value));
+      const skt = s.getConnection();
+      if (skt) {
+        skt.send(input.value);
+      }
       input.value = "";
     }
   });
@@ -39,12 +43,15 @@ export interface Session {
   getChannel    : () => number | null,
   setChannel    : (n: number) => number | null,
   genMessage    : (m: string, i?: boolean) => HTMLElement,
+  connect       : () => void,
+  getConnection : () => WebSocket | null,
 };
 
 export function startSession(): Session {
-  let _username               = "guest";
-  let _isOnline               = false;
-  let _channel: number | null = null;
+  let _username                 = "guest";
+  let _isOnline                 = false;
+  let _channel: number | null   = null;
+  let _socket: WebSocket | null = null;
   return {
     isInitialized : { input: false, stream: false, channels: false, },
     getChannel    : () => _channel,
@@ -83,6 +90,9 @@ export function startSession(): Session {
           .appendChild(div);
         _isOnline = true;
       }
-    }
+    },
+    connect:
+      () => _socket = new WebSocket(`ws://localhost:9003/${_channel}`),
+    getConnection: () => _socket,
   }
 }
