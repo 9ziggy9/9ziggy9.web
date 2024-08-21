@@ -24,7 +24,8 @@ export const INIT_MSG_INPUT = (s: Session) => {
       e.preventDefault();
       const skt = s.getConnection();
       if (skt) {
-        skt.send(input.value);
+        /* Very simple encoding, just a ';' delimiter */
+        skt.send(`${s.getUsername()};${input.value}`);
         stream.appendChild(s.genMessage(input.value));
       }
       input.value = "";
@@ -42,7 +43,7 @@ export interface Session {
   setUsername     : (name: string) => cmn.Result<string>,
   getChannel      : () => number | null,
   setChannel      : (n: number) => number | null,
-  genMessage      : (m: string, i?: boolean) => HTMLElement,
+  genMessage      : (m: string, s?: string) => HTMLElement,
   connect         : () => void,
   disconnect      : () => void,
   getConnection   : () => WebSocket | null,
@@ -72,14 +73,14 @@ export function startSession(): Session {
       _username = name;
       return { success: true, data: _username };
     },
-    genMessage: (m: string, info?: boolean) =>  {
+    genMessage: (m: string, sender?: string) =>  {
       const now  = new Date();
       const hrs  = now.getHours().toString().padStart(2, '0');
       const mins = now.getMinutes().toString().padStart(2, '0');
       const div  = document.createElement("div");
       div.classList.add("chat-stream-msg-box");
       div.innerHTML = MSG_TEMPLATE(
-        `${hrs}:${mins}`, info ? "[ INFO ]" : _username, m
+        `${hrs}:${mins}`, sender ? sender : _username, m
       );
       return div;
     },
@@ -99,7 +100,6 @@ export function startSession(): Session {
     () => {
       _socket = new WebSocket(`ws://localhost:9003/${_channel}`);
       _socket.onmessage = ({data}) => {
-        console.log("received message");
         if (_msgHandler) _msgHandler(data);
       };
     },

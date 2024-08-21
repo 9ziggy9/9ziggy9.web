@@ -145,7 +145,7 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
                   stream.innerHTML = "";
                   stream.appendChild(
                     ch.genMessage(
-                      `connected to channel ${ch.getChannel()}`, true
+                      `connected to channel ${ch.getChannel()}`, "[INFO]"
                     )
                   );
                 }
@@ -167,10 +167,14 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
           = document.getElementById("chat-stream-msg-container") as HTMLElement;
         stream.innerHTML = "";
         stream.appendChild(
-          ch.genMessage("Welcome! Please connect to a channel to chat!", true)
+          ch.genMessage(
+            "Welcome! Please connect to a channel to chat!", "[INFO]"
+          )
         );
         ch.attachMsgHandle((msg: string) => {
-          stream.appendChild(ch.genMessage(msg));
+          const [sender_name, sender_msg] = msg.split(";");
+          console.log(`message from: ${sender_name}\nmsg: ${sender_msg}`);
+          stream.appendChild(ch.genMessage(sender_msg, sender_name));
         });
       }
       if (vw.root.classList.contains("fullscreen")) mv.resetSizes(vw);
