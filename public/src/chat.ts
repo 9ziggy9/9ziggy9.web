@@ -20,9 +20,15 @@ const MSG_FROM = (t: MsgTemplate): string => {
     case ChSig.INFO:
       return `
         <div class="chat-stream-msg-inner">
-          <p class="chat-stream-msg-time">${t.time}</p>
+          <p class="chat-stream-msg-time"
+              style="color: var(--color-green);
+                     background-color: var(--color-dark);">
+            ${t.time}
+          </p>
         </div>
-        <p class="chat-stream-msg-post" style="color:var(--color-blue)">
+        <p class="chat-stream-msg-post"
+            style="color: var(--color-green);
+                   background-color: var(--color-dark);">
           ${t.msg}
         </p>
       `;
