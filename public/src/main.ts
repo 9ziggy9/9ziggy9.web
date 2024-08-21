@@ -4,6 +4,7 @@ import * as common from "./common"
 import * as themes from "./themes"
 import * as    win from "./window"
 import * as   chat from "./chat"
+import     {ChSig} from "./chat"
 import * as  login from "./login"
 
 function viewMountHandler(id: string, ev: string, fn: EventListener): void {
@@ -104,6 +105,37 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
     }
   });
 
+  const _curry_connect_utility =
+  (mv: MasterView, ch: chat.Session) => () => {
+    const chatChannelWin = mv.getWindow("chat-popup");
+    (chatChannelWin.toggle as Toggler)();
+    if (!ch.isInitialized.channels) {
+      ch.isInitialized.channels = true;
+      const connIn =
+        document.getElementById("chat-connect-in") as HTMLInputElement;
+      connIn.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          ch.connect(Number(connIn.value))
+            .then((ws) => {
+              if (ws) {
+                mv.getWindow("chat").updateHeader(
+                  `chat [channel: ${ch.getChannel()}]`
+                );
+                (chatChannelWin.toggle as Toggler)();
+                const stream = document
+                  .getElementById("chat-stream-msg-container") as HTMLElement;
+                stream.innerHTML = "";
+                stream.appendChild(
+                  ch.genMessage(`connected to channel ${ch.getChannel()}`)
+                );
+                ws.send(chat.encode(ChSig.JOIN, ch.getUsername()));
+              }
+            });
+        }
+      });
+    }
+  }
+
   mv.windowFrom({
     id: "view-chat",
     template: "--templ-view-chat",
@@ -124,34 +156,7 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
       {
         title: "run",
         actions: {
-          connect: () => {
-            const chatChannelWin = mv.getWindow("chat-popup");
-            (chatChannelWin.toggle as Toggler)();
-            if (!ch.isInitialized.channels) {
-              ch.isInitialized.channels = true;
-              const connIn =
-                document.getElementById("chat-connect-in") as HTMLInputElement;
-              connIn.addEventListener("keydown", e => {
-                if (e.key === "Enter") {
-                  // need to add validations
-                  ch.setChannel(Number(connIn.value));
-                  ch.connect();
-                  mv.getWindow("chat").updateHeader(
-                    `chat [channel: ${ch.getChannel()}]`
-                  );
-                  (chatChannelWin.toggle as Toggler)();
-                  const stream = document
-                    .getElementById("chat-stream-msg-container") as HTMLElement;
-                  stream.innerHTML = "";
-                  stream.appendChild(
-                    ch.genMessage(
-                      `connected to channel ${ch.getChannel()}`, "[INFO]"
-                    )
-                  );
-                }
-              });
-            }
-          },
+          connect: _curry_connect_utility(mv, ch),
         }
       },
     ]
@@ -167,15 +172,22 @@ function attachWindows(mv: MasterView, ch: chat.Session): void {
           = document.getElementById("chat-stream-msg-container") as HTMLElement;
         stream.innerHTML = "";
         stream.appendChild(
-          ch.genMessage(
-            "Welcome! Please connect to a channel to chat!", "[INFO]"
-          )
+          ch.genMessage("Welcome! Please connect to a channel to chat!")
         );
-        ch.attachMsgHandle((msg: string) => {
-          const [sender_name, sender_msg] = msg.split(";");
-          console.log(`message from: ${sender_name}\nmsg: ${sender_msg}`);
-          stream.appendChild(ch.genMessage(sender_msg, sender_name));
-        });
+        ch.attachHandler(ChSig.MESG, (msg: string) => {
+            const [_, sender_name, sender_msg] = msg.split(";");
+            stream.appendChild(ch.genMessage(sender_msg, sender_name));
+          })
+          .attachHandler(ChSig.JOIN, (msg: string) => {
+            const [_, sender_name] = msg.split(";");
+            stream.appendChild(
+              ch.genMessage(`${sender_name} joined channel.`)
+            );
+          })
+          .attachHandler(ChSig.INFO, (msg: string) => {
+            const [_, __, info_msg] = msg.split(";");
+            console.log(`${info_msg}`);
+          })
       }
       if (vw.root.classList.contains("fullscreen")) mv.resetSizes(vw);
     },
